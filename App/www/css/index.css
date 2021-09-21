@@ -1,0 +1,101 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+* {
+    font-size:20px;
+	font-family:'HelveticaNeue-Light', 'HelveticaNeue', Helvetica, Arial, sans-serif;
+}
+
+body {
+    -webkit-touch-callout: none;                /* prevent callout to copy image, etc when tap to hold */
+    -webkit-text-size-adjust: none;             /* prevent webkit from resizing text to fit */
+    -webkit-user-select: none;                  /* prevent copy paste, to allow, change 'none' to 'text' */
+    background-color:#ffffff;
+    height:100%;
+    margin:0px;
+    padding:0px;
+    width:100%;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: auto auto auto auto auto auto auto auto;
+  border-top:1px solid gray;
+}
+.grid-item {
+  text-align: center;
+}
+
+.ripple {
+  background-position: center;
+  transition: background 0.8s;
+}
+.ripple:hover {
+  background: #efefef radial-gradient(circle, transparent 1%, #efefef 1%) center/15000%;
+}
+.ripple:active {
+  background-color: #6eb9f7;
+  background-size: 100%;
+  transition: background 0s;
+}
+
+.ripple.accent:hover {
+  background: #2ca0f7 radial-gradient(circle, transparent 1%, #2ca0f7 1%) center/15000%;
+}
+.ripple.accent:active {
+	background-color: #6eb9f7;
+	background-size: 100%;
+  background-color: #6eb9f7;
+}
+
+.ripple.darker:hover {
+  background: #cfcfcf radial-gradient(circle, transparent 1%, #cfcfcf 1%) center/15000%;
+}
+.ripple.darker:active {
+  background-color: #6eb9f7;
+  background-size: 100%;
+  transition: background 0s;
+}
+
+.keypad {
+  border: none;
+  padding: 12px 18px;
+  font-size: 20px;
+  text-transform: bold;
+  cursor: pointer;
+  color: black;
+  background-color: #ffffff;
+  /*box-shadow: 0 0 4px #999;*/
+  outline: none;
+}
+
+.accent {
+	background-color: #0C80D7;
+	color: white;
+}
+
+.darker {
+	background-color: #d0d0d0;
+}
+
+sup {
+	color: #0080ff;
+  	position: absolute;
+	vertical-align: super;
+	font-size: 16px;
+}
