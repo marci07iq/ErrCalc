@@ -1,0 +1,28 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>Error spreadsheet</title>
+		<link rel="stylesheet" type="text/css" href="spreadsheet.css">
+		<script src="spreadsheet.js"></script>
+		<script src="App/www/js/maths.js"></script>
+	</head>
+	<body onload="init()">
+		<table>
+			<tbody id="spreadsheet">
+				<tr id = "symbol_label" class = "header_row locked">
+					<td class = "header_col locked">Name</td>
+				</tr>
+				<tr id = "symbol_unit" class = "header_row locked">
+					<td class = "header_col locked">Unit</td>
+				</tr>
+				<tr id = "symbol_exp" class = "header_row locked border_bot">
+					<td class = "header_col locked">Function</td>
+				</tr>
+			</tbody>
+		</table>
+		<hr>
+		<button onclick="addRow();">Add row</button>
+		<button onclick="addCol();">Add col</button>
+		<button onclick="calc();">Calc</button>
+	</body>
+</html>

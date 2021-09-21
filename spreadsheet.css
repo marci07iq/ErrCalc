@@ -1,0 +1,7 @@
+input.cell {
+	/*resize: horizontal;*/
+}
+
+tr.border_bot {
+    border-bottom: 1px solid #000;
+}
