@@ -11,22 +11,14 @@ export class StringStream {
 		this.parent = parent;
 	}
 
-	peekChar() {
-		if(this.pos < this.str.length) {
-			return this.str[this.pos];
-		}
-		return "";
-	}
-
 	peek(n: number = 1) {
 		return this.str.substr(this.pos, n);
 	}
 
-	getChar() {
-		if(this.pos < this.str.length) {
-			return this.str[this.pos++];
-		}
-		return "";
+	get(n: number = 1) {
+		let res: string = this.peek(n);
+		this.pos += res.length;
+		return res;
 	}
 
 	skipChar() {
@@ -34,7 +26,7 @@ export class StringStream {
 	}
 
 	skipThrough(chars: string = whitespace) {
-		while(chars.indexOf(this.peekChar()) != -1) {
+		while(chars.indexOf(this.peek(1)) != -1) {
 			this.skipChar();
 		}
 	}

@@ -1,3 +1,3 @@
-import { FullNumberParser } from "./number_parser";
+import { NumberParser } from "./number_parser";
 
-export { FullNumberParser };
+export { NumberParser };
