@@ -1,11 +1,15 @@
 {
 	"compilerOptions": {
-		"module": "commonjs",
-		"target": "es2020",
+		"module": "amd",
+		"target": "es5",
 		"jsx": "preserve",
 		"strictFunctionTypes": true,
-		"sourceMap": true
+		"sourceMap": true,
+		"outFile": "./build/build.js"
 	},
+	"include": [
+		"new"
+	],
 	"exclude": [
 		"node_modules",
 		"**/node_modules/*"
