@@ -1,52 +1,89 @@
 import { StringStream } from "../utils/string_stream";
 import { ParserError } from "./parser_error";
 
+//
+// Digit parser
+//
+
+function isDigit(char: string): boolean {
+	return '0' <= char && char <= '9';
+}
+
 function parseDigit(stream: StringStream): number {
 	let char = stream.peek(1);
-
-	if ("0" <= char && char <= "9") {
-		stream.get(1);
-		return char.charCodeAt(0) - "0".charCodeAt(0);
+	
+	if (isDigit(char)) {
+		stream.skip(1);
+		return Number(char);
 	}
 	return undefined;
 }
 
+//
+// Sign parser
+//
+
+function isPositiveSign(char): boolean {
+	return '+' === char;
+}
+
+function isNegativeSign(char): boolean {
+	return '-' === char;
+}
+
 function parseSign(stream: StringStream): number {
 	let signchar = stream.peek(1);
-	if(signchar === '+') {
-		stream.get(1);
+	if(isPositiveSign(signchar)) {
+		stream.skip(1);
 		return 1;
 	}
-	if(signchar === '-') {
-		stream.get(1);
+	if(isNegativeSign(signchar)) {
+		stream.skip(1);
 		return -1;
 	}
 	return 1;
 }
 
-function checkErrorSymbol(stream: StringStream): boolean {
-	let errchar = stream.peek(1);
-	if(errchar === '#') {
-		stream.get(1);
-		return true;
-	}
-	//Unicode +- symbol
-	if(errchar === '\u00B1') {
-		stream.get(1);
-		return true;
-	}
-	
+//
+// Error symbol parser
+//
+
+function isErrorSymbol(char: string): boolean {
+	if(char === '#') return true;
+	if(char === '\u00B1') return true;
 	return false;
 }
 
-function checkExponentialSymbol(stream: StringStream): boolean {
-	let expchar = stream.peek(1);
-	if(expchar === 'e') {
-		stream.get(1);
+function checkErrorSymbol(stream: StringStream): boolean {
+	let errchar = stream.peek(1);
+	if(isErrorSymbol(errchar)) {
+		stream.skip(1);
 		return true;
 	}
 	return false;
 }
+
+//
+// Exponential symbol parser
+//
+
+function isExponentialSymbol(char: string): boolean {
+	if(char === 'e') return true;
+	if(char === 'E') return true;
+	return false;
+}
+
+
+function checkExponentialSymbol(stream: StringStream): boolean {
+	let expchar = stream.peek(1);
+	if(isExponentialSymbol(expchar)) {
+		stream.skip(1);
+		return true;
+	}
+	return false;
+}
+
+//Parse sequence of digits
 
 interface parseDigitsResult {
 	num: number;
@@ -71,12 +108,12 @@ function parseDigits(stream: StringStream): parseDigitsResult {
 }
 
 interface NumberParserArgs {
-	allow_sign: boolean;
-	allow_exp: boolean;
-	allow_fraction: boolean;
-	allow_error: boolean;
-	allow_unit: boolean;
-	allow_none: boolean;
+	allow_sign: boolean; //Allow number to have sign
+	allow_exp: boolean; //Allow number to have expoential part
+	allow_fraction: boolean; //Allow number to have floating point
+	allow_error: boolean; //Allow number to have error
+	allow_unit: boolean; //Allow to have units
+	error_none: boolean; //Allow number to have 0 digits (used for parsing exponent when e is actually unit name)
 }
 
 export function NumberParser(stream: StringStream, args: NumberParserArgs) {
@@ -99,6 +136,7 @@ export function NumberParser(stream: StringStream, args: NumberParserArgs) {
 			let frac_num: parseDigitsResult = parseDigits(s);
 
 			//Prevent a single dot from being a number
+			// .1 and 1. are valid
 			if(frac_num.numdgts == 0 && main_num.numdgts == 0) {
 				throw new ParserError(s.pos - 1, s, "No digits found around decimal point");
 			} else {
@@ -106,20 +144,38 @@ export function NumberParser(stream: StringStream, args: NumberParserArgs) {
 				num += frac_num.num / Math.pow(10, frac_num.numdgts);
 			}
 		}
+	//No fraction, check for empty
 	} else {
 		if(main_num.numdgts == 0) {
-			if(args.allow_none) {
-			 return undefined;
+			if(args.error_none) {
+				throw new ParserError(s.pos, s, "No digits found in number");
 			}
-			throw new ParserError(s.pos, s, "No digits found in number");
+			return undefined;
 		}
 	}
 
+	//Exponential part
 	if(args.allow_exp) {
 		let s2 = s.transaction();
 
-		if(checkErrorSymbol(stream)) {
+		if(checkExponentialSymbol(s2)) {
+			let exp_num = NumberParser(s2, {
+				allow_sign: true, //1e+1 or 1e-1
+				allow_exp: false, //no 1e1e1
+				allow_fraction: false, //no 1e1.5
+				allow_error: false, //Error is parsed on the main number
+				allow_unit: false, //Unit is parsed onto the main number
+				error_none: false //e could be unit name
+			});
 
+			if(exp_num !== undefined) {
+				num *= Math.pow(10, num);
+			}
+
+			//Exponent successfully parsed
+			s2.commit();
 		}
 	}
+
+	
 }

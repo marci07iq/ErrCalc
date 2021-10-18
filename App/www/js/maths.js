@@ -494,7 +494,9 @@ function f_log(v) {
         }
         return o_div([f_ln([v[0]]), f_ln([v[1]])])
     } else { //base 10
-        return f_ln([v[0]], new Value(10, 0));
+        return new Value(
+            Math.log(v[0]._val),
+            v[0]._err / v[0]._val / Math.LN10);
     }
 }
 
