@@ -1,5 +1,5 @@
-import { FormatType, settings } from "../settings/settings";
 import { AlgebraBase, Numeric, printNumber } from "./numeric";
+import { FormatType, settings } from "../settings/settings";
 
 export class Basic implements Numeric {
 	val: number;

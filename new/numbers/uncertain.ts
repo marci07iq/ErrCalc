@@ -1,5 +1,5 @@
-import { FormatType, settings } from "../settings/settings";
 import { AlgebraBase, Numeric, getMagnitude, printNumber, printInt } from "./numeric";
+import { FormatType, settings } from "../settings/settings";
 
 export class Uncertain implements Numeric {
 	val: number;

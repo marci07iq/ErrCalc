@@ -1,28 +1,42 @@
-import { Value } from "./value";
+import { Numeric } from "../numbers/numeric";
+import { Function } from "./function";
 
-export interface Function {
+export class Scope<Type extends Numeric> {
+	//Private: cant be accessed by inner scopes
+	vars_private: Map<string, Type>;
+	fns_private: Map<string, Function<Type>>;
 
-}
+	//Public: can be accessed by inner scopes.
+	vars_public: Map<string, Type>;
+	fns_public: Map<string, Function<Type>>;
 
-export class Scope {
-	vars: Map<string, Value>;
-	fns: Map<string, Function>;
+	parent?: Scope<Type>;
 
-	parent?: Scope;
-
-	constructor(parent?: Scope, vars?: Map<string, Value>, fns?: Map<string, Function>) {
+	constructor(
+		parent?: Scope<Type>) {
 		this.parent = parent;
-		this.vars = vars ?? new Map<string, Value>();
-		this.fns = fns ?? new Map<string, Function>();
+
+		this.vars_private = new Map<string, Type>();
+		this.vars_public = new Map<string, Type>();
+		this.fns_private = new Map<string, Function<Type>>();
+		this.fns_public = new Map<string, Function<Type>>();
 	}
 
-	getVar(name: string): Value {
-		let res = this.vars.get(name);
-		return res ?? this.parent?.getVar(name);
+	getVarTrace(name: string): Type {
+		return this.vars_public.get(name) ?? this.parent?.getVarTrace(name);
 	}
 
-	getFn(name: string): Value {
-		let res = this.fns.get(name);
-		return res ?? this.parent?.getFn(name);
+	getFnTrace(name: string): Function<Type> {
+		return this.fns_public.get(name) ?? this.parent?.getFnTrace(name);
+	}
+
+
+
+	getVar(name: string): Type {
+		return this.vars_private.get(name) ?? this.getVarTrace(name);
+	}
+
+	getFn(name: string): Function<Type> {
+		return this.fns_private.get(name) ?? this.getFnTrace(name);
 	}
 }

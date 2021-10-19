@@ -5,9 +5,12 @@ export enum FormatType {
 };
 
 let settings = {
-	format: FormatType.Scientific,
+	format: FormatType.Smart,
 	digits: 3,
 };
 
 export { settings };
 
+/*export function createSettings(div: HTMLElement) {
+
+}*/
