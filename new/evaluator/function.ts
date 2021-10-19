@@ -323,10 +323,11 @@ class FunctionBuiltinCsc<Type extends Numeric> extends Function<Type> {
 export function createFns<Type extends Numeric>(algebra: AlgebraBase<Type>) : Map<string, Function<Type>> {
 	let fns = new Map<string, Function<Type>>();
 
-	fns.set("add", new FunctionBuiltinAdd<Type>(algebra));
-	fns.set("sub", new FunctionBuiltinSub<Type>(algebra));
-	fns.set("mul", new FunctionBuiltinMul<Type>(algebra));
-	fns.set("div", new FunctionBuiltinDiv<Type>(algebra));
+	//Make operator names unoverrideable.
+	fns.set("\\add", new FunctionBuiltinAdd<Type>(algebra));
+	fns.set("\\sub", new FunctionBuiltinSub<Type>(algebra));
+	fns.set("\\mul", new FunctionBuiltinMul<Type>(algebra));
+	fns.set("\\div", new FunctionBuiltinDiv<Type>(algebra));
 
 	fns.set("pow", new FunctionBuiltinPow<Type>(algebra));
 	fns.set("ln", new FunctionBuiltinLn<Type>(algebra));

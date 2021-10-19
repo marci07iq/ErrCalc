@@ -3,10 +3,12 @@ import { Function } from "./function";
 
 export class Scope<Type extends Numeric> {
 	//Private: cant be accessed by inner scopes
+	//Used for function params
 	vars_private: Map<string, Type>;
 	fns_private: Map<string, Function<Type>>;
 
 	//Public: can be accessed by inner scopes.
+	//Use for global, namespaces, ...
 	vars_public: Map<string, Type>;
 	fns_public: Map<string, Function<Type>>;
 
