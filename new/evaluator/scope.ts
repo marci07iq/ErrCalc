@@ -1,7 +1,7 @@
 import { Numeric } from "../numbers/numeric";
 import { Function } from "./function";
 
-export class Scope<Type extends Numeric> {
+export class Scope<Type extends Numeric<Type>> {
 	//Private: cant be accessed by inner scopes
 	//Used for function params
 	vars_private: Map<string, Type>;

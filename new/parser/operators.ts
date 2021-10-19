@@ -4,18 +4,18 @@ import { StringStream, checkChar } from "../utils/string_stream";
 import { charmap } from "./charmap";
 import { ParserError } from "./parser_error";
 
-type operatorParser<Type extends Numeric> = (
+type operatorParser<Type extends Numeric<Type>> = (
 	stream: StringStream,
 	parser: OperatorParser<Type>,
 	precedence: number) => Token<Type>;
 
-class PrecedenceClass<Type extends Numeric> {
+class PrecedenceClass<Type extends Numeric<Type>> {
 	symbols: Set<string>;
 	precedence: number;
 	parser: operatorParser<Type>
 }
 
-function parsePrimitive<Type extends Numeric>(
+function parsePrimitive<Type extends Numeric<Type>>(
 	stream: StringStream,
 	parser: OperatorParser<Type>,
 	precedence: number): Token<Type> {
@@ -28,7 +28,7 @@ function parsePrimitive<Type extends Numeric>(
 	return undefined;
 }
 
-function parseOpBinaryL2R<Type extends Numeric>(
+function parseOpBinaryL2R<Type extends Numeric<Type>>(
 	stream: StringStream,
 	parser: OperatorParser<Type>,
 	precedence: number): Token<Type> {
@@ -63,7 +63,7 @@ function parseOpBinaryL2R<Type extends Numeric>(
 
 	return res;
 }
-export class OperatorParser<Type extends Numeric> {
+export class OperatorParser<Type extends Numeric<Type>> {
 	operators: Set<string>;
 	precedence: Array<PrecedenceClass<Type>>;
 

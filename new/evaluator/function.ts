@@ -2,7 +2,7 @@ import { Numeric, AlgebraBase } from "../numbers/numeric";
 import { Scope } from "./scope";
 import { Token } from "./token";
 
-export abstract class Function<Type extends Numeric> {
+export abstract class Function<Type extends Numeric<Type>> {
 	algebra: AlgebraBase<Type>;
 
 	constructor(algebra: AlgebraBase<Type>) {
@@ -12,7 +12,7 @@ export abstract class Function<Type extends Numeric> {
 	abstract evaluate(scope: Scope<Type>, args: Array<Token<Type>>): Type;
 }
 
-export class FunctionUser<Type extends Numeric> extends Function<Type> {
+export class FunctionUser<Type extends Numeric<Type>> extends Function<Type> {
 	argnames: Array<string>;
 	token: Token<Type>;
 
@@ -43,7 +43,7 @@ export class FunctionUser<Type extends Numeric> extends Function<Type> {
 }
 
 
-class FunctionBuiltinAdd<Type extends Numeric> extends Function<Type> {
+class FunctionBuiltinAdd<Type extends Numeric<Type>> extends Function<Type> {
 
 	evaluate(scope: Scope<Type>, args: Array<Token<Type>>): Type {
 		if (args.length != 2) {
@@ -56,7 +56,7 @@ class FunctionBuiltinAdd<Type extends Numeric> extends Function<Type> {
 	}
 }
 
-class FunctionBuiltinSub<Type extends Numeric> extends Function<Type> {
+class FunctionBuiltinSub<Type extends Numeric<Type>> extends Function<Type> {
 	algebra: AlgebraBase<Type>;
 
 	evaluate(scope: Scope<Type>, args: Array<Token<Type>>): Type {
@@ -70,7 +70,7 @@ class FunctionBuiltinSub<Type extends Numeric> extends Function<Type> {
 	}
 }
 
-class FunctionBuiltinMul<Type extends Numeric> extends Function<Type> {
+class FunctionBuiltinMul<Type extends Numeric<Type>> extends Function<Type> {
 	algebra: AlgebraBase<Type>;
 
 	evaluate(scope: Scope<Type>, args: Array<Token<Type>>): Type {
@@ -84,7 +84,7 @@ class FunctionBuiltinMul<Type extends Numeric> extends Function<Type> {
 	}
 }
 
-class FunctionBuiltinDiv<Type extends Numeric> extends Function<Type> {
+class FunctionBuiltinDiv<Type extends Numeric<Type>> extends Function<Type> {
 	algebra: AlgebraBase<Type>;
 
 	evaluate(scope: Scope<Type>, args: Array<Token<Type>>): Type {
@@ -98,7 +98,7 @@ class FunctionBuiltinDiv<Type extends Numeric> extends Function<Type> {
 	}
 }
 
-class FunctionBuiltinPow<Type extends Numeric> extends Function<Type> {
+class FunctionBuiltinPow<Type extends Numeric<Type>> extends Function<Type> {
 	algebra: AlgebraBase<Type>;
 
 	evaluate(scope: Scope<Type>, args: Array<Token<Type>>): Type {
@@ -112,7 +112,7 @@ class FunctionBuiltinPow<Type extends Numeric> extends Function<Type> {
 	}
 }
 
-class FunctionBuiltinLn<Type extends Numeric> extends Function<Type> {
+class FunctionBuiltinLn<Type extends Numeric<Type>> extends Function<Type> {
 	algebra: AlgebraBase<Type>;
 
 	evaluate(scope: Scope<Type>, args: Array<Token<Type>>): Type {
@@ -125,7 +125,7 @@ class FunctionBuiltinLn<Type extends Numeric> extends Function<Type> {
 	}
 }
 
-class FunctionBuiltinSqrt<Type extends Numeric> extends Function<Type> {
+class FunctionBuiltinSqrt<Type extends Numeric<Type>> extends Function<Type> {
 	algebra: AlgebraBase<Type>;
 
 	evaluate(scope: Scope<Type>, args: Array<Token<Type>>): Type {
@@ -138,7 +138,7 @@ class FunctionBuiltinSqrt<Type extends Numeric> extends Function<Type> {
 	}
 }
 
-class FunctionBuiltinExp<Type extends Numeric> extends Function<Type> {
+class FunctionBuiltinExp<Type extends Numeric<Type>> extends Function<Type> {
 	algebra: AlgebraBase<Type>;
 
 	evaluate(scope: Scope<Type>, args: Array<Token<Type>>): Type {
@@ -153,7 +153,7 @@ class FunctionBuiltinExp<Type extends Numeric> extends Function<Type> {
 
 
 
-class FunctionBuiltinLog2<Type extends Numeric> extends Function<Type> {
+class FunctionBuiltinLog2<Type extends Numeric<Type>> extends Function<Type> {
 	algebra: AlgebraBase<Type>;
 
 	evaluate(scope: Scope<Type>, args: Array<Token<Type>>): Type {
@@ -166,7 +166,7 @@ class FunctionBuiltinLog2<Type extends Numeric> extends Function<Type> {
 	}
 }
 
-class FunctionBuiltinLog10<Type extends Numeric> extends Function<Type> {
+class FunctionBuiltinLog10<Type extends Numeric<Type>> extends Function<Type> {
 	algebra: AlgebraBase<Type>;
 
 	evaluate(scope: Scope<Type>, args: Array<Token<Type>>): Type {
@@ -179,7 +179,7 @@ class FunctionBuiltinLog10<Type extends Numeric> extends Function<Type> {
 	}
 }
 
-class FunctionBuiltinLog<Type extends Numeric> extends Function<Type> {
+class FunctionBuiltinLog<Type extends Numeric<Type>> extends Function<Type> {
 	algebra: AlgebraBase<Type>;
 
 	evaluate(scope: Scope<Type>, args: Array<Token<Type>>): Type {
@@ -203,7 +203,7 @@ class FunctionBuiltinLog<Type extends Numeric> extends Function<Type> {
 	}
 }
 
-class FunctionBuiltinSin<Type extends Numeric> extends Function<Type> {
+class FunctionBuiltinSin<Type extends Numeric<Type>> extends Function<Type> {
 	algebra: AlgebraBase<Type>;
 
 	evaluate(scope: Scope<Type>, args: Array<Token<Type>>): Type {
@@ -216,7 +216,7 @@ class FunctionBuiltinSin<Type extends Numeric> extends Function<Type> {
 	}
 }
 
-class FunctionBuiltinCos<Type extends Numeric> extends Function<Type> {
+class FunctionBuiltinCos<Type extends Numeric<Type>> extends Function<Type> {
 	algebra: AlgebraBase<Type>;
 
 	evaluate(scope: Scope<Type>, args: Array<Token<Type>>): Type {
@@ -229,7 +229,7 @@ class FunctionBuiltinCos<Type extends Numeric> extends Function<Type> {
 	}
 }
 
-class FunctionBuiltinTan<Type extends Numeric> extends Function<Type> {
+class FunctionBuiltinTan<Type extends Numeric<Type>> extends Function<Type> {
 	algebra: AlgebraBase<Type>;
 
 	evaluate(scope: Scope<Type>, args: Array<Token<Type>>): Type {
@@ -242,7 +242,7 @@ class FunctionBuiltinTan<Type extends Numeric> extends Function<Type> {
 	}
 }
 
-class FunctionBuiltinASin<Type extends Numeric> extends Function<Type> {
+class FunctionBuiltinASin<Type extends Numeric<Type>> extends Function<Type> {
 	algebra: AlgebraBase<Type>;
 
 	evaluate(scope: Scope<Type>, args: Array<Token<Type>>): Type {
@@ -255,7 +255,7 @@ class FunctionBuiltinASin<Type extends Numeric> extends Function<Type> {
 	}
 }
 
-class FunctionBuiltinACos<Type extends Numeric> extends Function<Type> {
+class FunctionBuiltinACos<Type extends Numeric<Type>> extends Function<Type> {
 	algebra: AlgebraBase<Type>;
 
 	evaluate(scope: Scope<Type>, args: Array<Token<Type>>): Type {
@@ -268,7 +268,7 @@ class FunctionBuiltinACos<Type extends Numeric> extends Function<Type> {
 	}
 }
 
-class FunctionBuiltinATan<Type extends Numeric> extends Function<Type> {
+class FunctionBuiltinATan<Type extends Numeric<Type>> extends Function<Type> {
 	algebra: AlgebraBase<Type>;
 
 	evaluate(scope: Scope<Type>, args: Array<Token<Type>>): Type {
@@ -281,7 +281,7 @@ class FunctionBuiltinATan<Type extends Numeric> extends Function<Type> {
 	}
 }
 
-class FunctionBuiltinCtg<Type extends Numeric> extends Function<Type> {
+class FunctionBuiltinCtg<Type extends Numeric<Type>> extends Function<Type> {
 	algebra: AlgebraBase<Type>;
 
 	evaluate(scope: Scope<Type>, args: Array<Token<Type>>): Type {
@@ -294,7 +294,7 @@ class FunctionBuiltinCtg<Type extends Numeric> extends Function<Type> {
 	}
 }
 
-class FunctionBuiltinSec<Type extends Numeric> extends Function<Type> {
+class FunctionBuiltinSec<Type extends Numeric<Type>> extends Function<Type> {
 	algebra: AlgebraBase<Type>;
 
 	evaluate(scope: Scope<Type>, args: Array<Token<Type>>): Type {
@@ -307,7 +307,7 @@ class FunctionBuiltinSec<Type extends Numeric> extends Function<Type> {
 	}
 }
 
-class FunctionBuiltinCsc<Type extends Numeric> extends Function<Type> {
+class FunctionBuiltinCsc<Type extends Numeric<Type>> extends Function<Type> {
 	algebra: AlgebraBase<Type>;
 
 	evaluate(scope: Scope<Type>, args: Array<Token<Type>>): Type {
@@ -320,7 +320,7 @@ class FunctionBuiltinCsc<Type extends Numeric> extends Function<Type> {
 	}
 }
 
-export function createFns<Type extends Numeric>(algebra: AlgebraBase<Type>) : Map<string, Function<Type>> {
+export function createFns<Type extends Numeric<Type>>(algebra: AlgebraBase<Type>) : Map<string, Function<Type>> {
 	let fns = new Map<string, Function<Type>>();
 
 	//Make operator names unoverrideable.

@@ -1,12 +1,14 @@
 import { FormatType } from "../settings/settings";
 
-export interface Numeric {
+export interface Numeric<This extends Numeric<This>> {
 	//Print
 	print_text(): string;
 	print_tex(): string;
+
+	get_algebra(): AlgebraBase<This>;
 };
 
-export abstract class AlgebraBase<Type extends Numeric> {
+export abstract class AlgebraBase<Type extends Numeric<Type>> {
 	//Static factory
 	abstract factory(val: number): Type;
 

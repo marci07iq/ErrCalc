@@ -1,11 +1,11 @@
 import { Scope } from "./scope";
 import { Numeric } from "../numbers/numeric";
 
-export interface Token<Type extends Numeric> {
+export interface Token<Type extends Numeric<Type>> {
 	evaluate(scope: Scope<Type>): Type;
 }
 
-export class TokenNumber<Type extends Numeric> implements Token<Type> {
+export class TokenNumber<Type extends Numeric<Type>> implements Token<Type> {
 	val: Type;
 
 	constructor(val: Type) {
@@ -17,7 +17,7 @@ export class TokenNumber<Type extends Numeric> implements Token<Type> {
 	}
 }
 
-export class TokenVar<Type extends Numeric> implements Token<Type> {
+export class TokenVar<Type extends Numeric<Type>> implements Token<Type> {
 	name: string;
 
 	constructor(name: string) {
@@ -33,7 +33,7 @@ export class TokenVar<Type extends Numeric> implements Token<Type> {
 	}
 }
 
-export class TokenFunction<Type extends Numeric> implements Token<Type> {
+export class TokenFunction<Type extends Numeric<Type>> implements Token<Type> {
 	name: string;
 	args: Array<Token<Type>>;
 

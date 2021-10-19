@@ -1,11 +1,11 @@
 import { AlgebraBase, Numeric, getMagnitude, printNumber, printInt } from "./numeric";
 import { FormatType, settings } from "../settings/settings";
 
-export class Uncertain implements Numeric<Uncertain> {
-	static algebra: AlgebraUncertain_;
+export class Tensor<Underlying extends Numeric<Underlying>> implements Numeric<Tensor<Underlying>> {
+	static algebra: AlgebraTensor_<Underlying>;
 
-	get_algebra(): AlgebraBase<Uncertain> {
-		return Uncertain.algebra;
+	get_algebra(): AlgebraBase<Tensor<Underlying>> {
+		return Tensor.algebra;
 	}
 
 	val: number;
@@ -68,97 +68,97 @@ export class Uncertain implements Numeric<Uncertain> {
 	}
 }
 
-class AlgebraUncertain_ extends AlgebraBase<Uncertain> {
+class AlgebraTensor_<Underlying extends Numeric<Underlying>> extends AlgebraBase<Tensor<Underlying>> {
 	//Static factory
-	factory(val: number): Uncertain {
-		return new Uncertain(val, 0);
+	factory(val: number): Tensor<Underlying> {
+		return new Tensor(val, 0);
 	}
 
-	//Uncertain
-	add(lhs: Uncertain, rhs: Uncertain): Uncertain {
-		return new Uncertain(lhs.val + rhs.val,
+	//Tensor
+	add(lhs: Tensor<Underlying>, rhs: Tensor<Underlying>): Tensor<Underlying> {
+		return new Tensor(lhs.val + rhs.val,
 			Math.sqrt(lhs.err*lhs.err + rhs.err*rhs.err));
 	}
-	sub(lhs: Uncertain, rhs: Uncertain): Uncertain {
-		return new Uncertain(lhs.val - rhs.val,
+	sub(lhs: Tensor<Underlying>, rhs: Tensor<Underlying>): Tensor<Underlying> {
+		return new Tensor(lhs.val - rhs.val,
 			Math.sqrt(lhs.err*lhs.err + rhs.err*rhs.err));
 	}
-	mul(lhs: Uncertain, rhs: Uncertain): Uncertain {
-		return new Uncertain(lhs.val * rhs.val,
+	mul(lhs: Tensor<Underlying>, rhs: Tensor<Underlying>): Tensor<Underlying> {
+		return new Tensor(lhs.val * rhs.val,
 			Math.sqrt(Math.pow(lhs.err * rhs.val, 2) + Math.pow(rhs.err * lhs.val, 2)));
 	}
-	div(lhs: Uncertain, rhs: Uncertain): Uncertain {
-		return new Uncertain(lhs.val / rhs.val,
+	div(lhs: Tensor<Underlying>, rhs: Tensor<Underlying>): Tensor<Underlying> {
+		return new Tensor(lhs.val / rhs.val,
 			Math.sqrt(Math.pow(lhs.err, 2) + Math.pow(rhs.err * lhs.val / rhs.val, 2)) / rhs.val);
 	}
 
 	//Exponential
-	pow(lhs: Uncertain, rhs: Uncertain): Uncertain {
-		return new Uncertain(Math.pow(lhs.val, rhs.val),
+	pow(lhs: Tensor<Underlying>, rhs: Tensor<Underlying>): Tensor<Underlying> {
+		return new Tensor(Math.pow(lhs.val, rhs.val),
 		Math.pow(lhs.val, rhs.val) * Math.sqrt(
 			Math.pow(rhs.val * lhs.err / lhs.val, 2) +
 			Math.pow(Math.log(Math.abs(lhs.val)) * rhs.err, 2)),);
 	}
-	loge(lhs: Uncertain): Uncertain {
-		return new Uncertain(Math.log(lhs.val),
+	loge(lhs: Tensor<Underlying>): Tensor<Underlying> {
+		return new Tensor(Math.log(lhs.val),
 		lhs.err / lhs.val);
 	}
 	
 
-	sqrt(lhs: Uncertain): Uncertain {
-		return new Uncertain(Math.sqrt(lhs.val),
+	sqrt(lhs: Tensor<Underlying>): Tensor<Underlying> {
+		return new Tensor(Math.sqrt(lhs.val),
 		Math.sqrt(lhs.val) * 0.5 * lhs.err / lhs.val);
 	}
-	exp(lhs: Uncertain): Uncertain {
-		return new Uncertain(Math.exp(lhs.val),
+	exp(lhs: Tensor<Underlying>): Tensor<Underlying> {
+		return new Tensor(Math.exp(lhs.val),
 		Math.exp(lhs.val)*lhs.err);
 	}
-	log2(lhs: Uncertain): Uncertain {
-		return new Uncertain(Math.log2(lhs.val),
+	log2(lhs: Tensor<Underlying>): Tensor<Underlying> {
+		return new Tensor(Math.log2(lhs.val),
 		lhs.err / lhs.val / Math.LN2);
 	}
-	log10(lhs: Uncertain): Uncertain {
-		return new Uncertain(Math.log10(lhs.val),
+	log10(lhs: Tensor<Underlying>): Tensor<Underlying> {
+		return new Tensor(Math.log10(lhs.val),
 		lhs.err / lhs.val / Math.LN10);
 	}
-	/*log(lhs: Uncertain, rhs: Uncertain): Uncertain{
+	/*log(lhs: Tensor<Underlying>, rhs: Tensor<Underlying>): Tensor<Underlying> {
 		return this.div(this.loge(lhs), this.loge(rhs));
 	}*/
 
 	//Trig
-	sin(lhs: Uncertain): Uncertain{
-		return new Uncertain(Math.sin(lhs.val),
+	sin(lhs: Tensor<Underlying>): Tensor<Underlying> {
+		return new Tensor(Math.sin(lhs.val),
 		Math.cos(lhs.val) * lhs.err);
 	}
-	cos(lhs: Uncertain): Uncertain{
-		return new Uncertain(Math.cos(lhs.val),
+	cos(lhs: Tensor<Underlying>): Tensor<Underlying> {
+		return new Tensor(Math.cos(lhs.val),
 		Math.sin(lhs.val) * lhs.err);
 	}
-	asin(lhs: Uncertain): Uncertain{
-		return new Uncertain(Math.asin(lhs.val),
+	asin(lhs: Tensor<Underlying>): Tensor<Underlying> {
+		return new Tensor(Math.asin(lhs.val),
 		lhs.err / Math.sqrt(1 - lhs.val * lhs.val));
 	}
-	acos(lhs: Uncertain): Uncertain{
-		return new Uncertain(Math.acos(lhs.val),
+	acos(lhs: Tensor<Underlying>): Tensor<Underlying> {
+		return new Tensor(Math.acos(lhs.val),
 		- lhs.err / Math.sqrt(1 - lhs.val * lhs.val));
 	}
-	atan(lhs: Uncertain): Uncertain{
-		return new Uncertain(Math.atan(lhs.val),
+	atan(lhs: Tensor<Underlying>): Tensor<Underlying> {
+		return new Tensor(Math.atan(lhs.val),
 		lhs.err / (1 + lhs.val * lhs.val));
 	}
 
-	/*tan(lhs: Uncertain): Uncertain {
+	/*tan(lhs: Tensor<Underlying>): Tensor<Underlying> {
 		return this.div(this.sin(lhs), this.cos(lhs));
 	};
-	ctg(lhs: Uncertain): Uncertain {
+	ctg(lhs: Tensor<Underlying>): Tensor<Underlying> {
 		return this.div(this.cos(lhs), this.sin(lhs));
 	};
-	sec(lhs: Uncertain): Uncertain {
-		return new Uncertain(1/Math.cos(lhs.val));
+	sec(lhs: Tensor<Underlying>): Tensor<Underlying> {
+		return new Tensor(1/Math.cos(lhs.val));
 	};
-	csc(lhs: Uncertain): Uncertain {
-		return new Uncertain(1/Math.sin(lhs.val));
+	csc(lhs: Tensor<Underlying>): Tensor<Underlying> {
+		return new Tensor(1/Math.sin(lhs.val));
 	};*/
 };
 
-Uncertain.algebra = new AlgebraUncertain_();
+Tensor.algebra = new AlgebraTensor_();

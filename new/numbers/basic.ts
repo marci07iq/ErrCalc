@@ -1,8 +1,16 @@
 import { AlgebraBase, Numeric, printNumber } from "./numeric";
 import { FormatType, settings } from "../settings/settings";
 
-export class Basic implements Numeric {
+export class Basic implements Numeric<Basic> {
+	static algebra: AlgebraBasic_;
+
+	get_algebra(): AlgebraBase<Basic> {
+		return Basic.algebra;
+	}
+
 	val: number;
+
+
 
 	constructor(val: number) {
 		this.val = val;
@@ -92,4 +100,4 @@ class AlgebraBasic_ extends AlgebraBase<Basic> {
 	};
 };
 
-export const AlgebraBasic: AlgebraBasic_ = new AlgebraBasic_();
+Basic.algebra = new AlgebraBasic_();
