@@ -10,12 +10,13 @@ function parseOperatorSymbol(stream: StringStream): string {
 	let good = false;
 	//While valid operator char
 	while (checkChar(stream.peek(), charmap.operator)) {
-		let newres = res + stream.get();
+		let newres = res + stream.peek();
 		let newgood = operators.has(newres);
 		//End of valid operator name (eg ! is valid but !! isnt)
 		if (good && !newgood) {
 			break;
 		}
+		stream.skip();
 		res = newres;
 		good = newgood;
 	}
@@ -194,10 +195,11 @@ function parseOpUnaryL(
 	//Unary prefix operator
 	//Grammar: [op(0)]+ token(+1)
 	let s = stream.transaction();
+	s.skipThrough();
 	let op = parseOperatorSymbol(s);
 	//This level
 	if(precedence[prec_class].symbols.has(op)) {
-		let term = precedence[prec_class].parser(stream, prec_class);
+		let term = precedence[prec_class].parser(s, prec_class);
 		if(term === undefined) {
 			s.error("Unary " + op + " expected right argument, found nothing");
 		}
