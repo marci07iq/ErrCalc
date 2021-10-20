@@ -4,14 +4,14 @@ import { Scope } from "./scope";
 
 export const globalScope: Scope = new Scope();
 
-globalScope.fns_public.set("\\add", new FunctionBuiltinAlgebra("\\add"));
-globalScope.fns_public.set("\\pos", new FunctionBuiltinAlgebra("\\pos"));
-globalScope.fns_public.set("\\sub", new FunctionBuiltinAlgebra("\\sub"));
-globalScope.fns_public.set("\\neg", new FunctionBuiltinAlgebra("\\neg"));
-globalScope.fns_public.set("\\mul", new FunctionBuiltinAlgebra("\\mul"));
-globalScope.fns_public.set("\\div", new FunctionBuiltinAlgebra("\\div"));
+globalScope.fns_public.set("\\add", new FunctionBuiltinAlgebra("add"));
+globalScope.fns_public.set("\\pos", new FunctionBuiltinAlgebra("pos"));
+globalScope.fns_public.set("\\sub", new FunctionBuiltinAlgebra("sub"));
+globalScope.fns_public.set("\\neg", new FunctionBuiltinAlgebra("neg"));
+globalScope.fns_public.set("\\mul", new FunctionBuiltinAlgebra("mul"));
+globalScope.fns_public.set("\\div", new FunctionBuiltinAlgebra("div"));
 globalScope.fns_public.set("sqrt", new FunctionBuiltinAlgebra("sqrt"));
-globalScope.fns_public.set("pow", new FunctionBuiltinAlgebra("pow"));
+globalScope.fns_public.set("\\pow", new FunctionBuiltinAlgebra("pow"));
 globalScope.fns_public.set("ln", new FunctionBuiltinAlgebra("ln"));
 globalScope.fns_public.set("log", new FunctionBuiltinAlgebra("log"));
 globalScope.fns_public.set("log2", new FunctionBuiltinAlgebra("log2"));

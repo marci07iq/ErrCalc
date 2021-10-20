@@ -33,32 +33,32 @@ export class NumberWrapper implements Type {
 
 //Basic operators
 
-Overloads.add("\\add", [TypeID.Number, TypeID.Number], (vs) => {
+Overloads.add("add", [TypeID.Number, TypeID.Number], (vs) => {
 	let vst = vs as Array<NumberWrapper>;
 	return new NumberWrapper(vst[0].val + vst[1].val);
 });
 
-Overloads.add("\\pos", [TypeID.Number], (vs) => {
+Overloads.add("pos", [TypeID.Number], (vs) => {
 	let vst = vs as Array<NumberWrapper>;
 	return vst[0];
 });
 
-Overloads.add("\\sub", [TypeID.Number, TypeID.Number], (vs) => {
+Overloads.add("sub", [TypeID.Number, TypeID.Number], (vs) => {
 	let vst = vs as Array<NumberWrapper>;
 	return new NumberWrapper(vst[0].val - vst[1].val);
 });
 
-Overloads.add("\\neg", [TypeID.Number], (vs) => {
+Overloads.add("neg", [TypeID.Number], (vs) => {
 	let vst = vs as Array<NumberWrapper>;
 	return new NumberWrapper(-vst[0].val);
 });
 
-Overloads.add("\\mul", [TypeID.Number, TypeID.Number], (vs) => {
+Overloads.add("mul", [TypeID.Number, TypeID.Number], (vs) => {
 	let vst = vs as Array<NumberWrapper>;
 	return new NumberWrapper(vst[0].val * vst[1].val);
 });
 
-Overloads.add("\\div", [TypeID.Number, TypeID.Number], (vs) => {
+Overloads.add("div", [TypeID.Number, TypeID.Number], (vs) => {
 	let vst = vs as Array<NumberWrapper>;
 	return new NumberWrapper(vst[0].val / vst[1].val);
 });

@@ -1,5 +1,5 @@
 import { Type } from "../numbers/types";
-import { Token, TokenFunction, TokenNumber, TokenVar } from "../evaluator/token";
+import { Token, TokenFunction, TokenVar } from "../evaluator/token";
 import { StringStream, checkChar } from "../utils/string_stream";
 import { charmap } from "./charmap";
 import { parseNumericToken } from "./number_token";
@@ -10,8 +10,8 @@ function parseOperatorSymbol(stream: StringStream): string {
 	let good = false;
 	//While valid operator char
 	while (checkChar(stream.peek(), charmap.operator)) {
-		let newres = res + stream.peek();
-		let newgood = this.operators.has(newres);
+		let newres = res + stream.get();
+		let newgood = operators.has(newres);
 		//End of valid operator name (eg ! is valid but !! isnt)
 		if (good && !newgood) {
 			break;
@@ -34,7 +34,7 @@ function parseName(stream: StringStream): string {
 	//While valid operator char
 	if (checkChar(stream.peek(), charmap.name_start)) {
 		while (checkChar(stream.peek(), charmap.name_mid)) {
-			res = res + stream.peek();
+			res = res + stream.get();
 		}
 	} else {
 		//Nothing is not an error, caller will hard fail if needed name
@@ -68,7 +68,7 @@ function parsePrimitive(
 	s.skipThrough();
 
 	if(s.peek() == '(') {
-
+		s.skip();
 		let res = parseExpression(s);
 		s.skipThrough();
 		if(s.peek() != ')') {
@@ -92,6 +92,7 @@ function parsePrimitive(
 		s.skipThrough();
 
 		if(s.peek() == '(') {
+			s.skip();
 			let contents = parseList(s);
 			s.skipThrough();
 			if(s.peek() != ')') {
@@ -110,7 +111,10 @@ function parsePrimitive(
 	s = stream.transaction();
 	s.skipThrough();
 	let num = parseNumericToken(s);
-	if(num !== undefined) return num;
+	if(num !== undefined) {
+		s.commit();
+		return num;
+	}
 
 	//Not understood.
 	return undefined;
@@ -146,6 +150,38 @@ function parseOpBinaryL2R(
 		} else {
 			break;
 		}
+	}
+
+	return res;
+}
+
+function parseOpBinaryR2L(
+	stream: StringStream,
+	prec_class: number): Token {
+	
+	//Grammar:
+	//<wh>Prec(+1)<wh>[op(0)<wh>Prec(+1)]...
+	stream.skipThrough();
+	let leading = precedence[prec_class + 1].parser(stream, prec_class + 1);
+	if(leading === undefined) {
+		stream.error("Expected token found nothing");
+	}
+	let res = leading;
+
+	stream.skipThrough();
+	let s = stream.transaction();
+	let op = parseOperatorSymbol(s);
+	//This level
+	if(precedence[prec_class].symbols.has(op)) {
+		//Parse RHS with self
+		let term = precedence[prec_class].parser(s, prec_class);
+		if(term === undefined) {
+			s.error("Binary " + op + " expected right argument, found nothing");
+		}
+
+		res = new TokenFunction(precedence[prec_class].symbols.get(op), [res, term]);
+
+		s.commit();
 	}
 
 	return res;
@@ -188,6 +224,11 @@ const precedence: Array<PrecedenceClass> = [
 	},
 	{
 		symbols: new Map<string, string>([
+			["^", "\\pow"]]),
+		parser: parseOpBinaryR2L
+	},
+	{
+		symbols: new Map<string, string>([
 			["+", "\\pos"],
 			["-", "\\neg"]
 		]),
@@ -200,11 +241,12 @@ const precedence: Array<PrecedenceClass> = [
 ];
 
 const operators: Set<string> = new Set<string>();
-precedence.forEach((p) => {
-	p.symbols.forEach((symbol) => {
-		operators.add(symbol);
-	});
-});
+precedence.forEach((prec_class) => {
+	for (const [key, value] of prec_class.symbols.entries()) {
+		operators.add(key);
+	}
+})
+
 
 export function parseExpression(stream: StringStream): Token {
 	stream.skipThrough();

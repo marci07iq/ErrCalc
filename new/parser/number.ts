@@ -128,7 +128,7 @@ export function parseFloat(stream: StringStream): number {
 			num += main_num.sign * frac_num.num / Math.pow(10, frac_num.numdgts);
 		}
 	} else {
-		if(main_num.numdgts == 0) {
+		if (main_num.numdgts == 0) {
 			return undefined;
 		}
 	}
@@ -140,21 +140,19 @@ export function parseFloat(stream: StringStream): number {
 export function parseScientific(stream: StringStream): number {
 	let float = parseFloat(stream);
 
-	if(float === undefined) {
+	if (float === undefined) {
 		return undefined;
 	}
 	let s = stream.transaction();
-	if(parseExponentialSymbol(s)) {
-		let exponent = parseDigits(s);
+	if (parseExponentialSymbol(s)) {
 
-		if(exponent.numdgts) {
-			let num_exp = parseSigned(s);
+		let num_exp = parseSigned(s);
 
-			if(num_exp.numdgts > 0) {
-				float *= Math.pow(10, num_exp.num);
-				s.commit();
-			}
+		if (num_exp.numdgts > 0) {
+			float *= Math.pow(10, num_exp.num);
+			s.commit();
 		}
+
 	}
 
 	return float;

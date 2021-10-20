@@ -6,7 +6,7 @@ export const charmap = {
 	//Digits
 	digit: "0123456789",
 	//Characters from operators
-	operator: "+-*/=<>!&|",
+	operator: "+-*/=<>!&|^",
 	//Brackets
 	brackets: "()[]{}"
 };

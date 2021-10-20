@@ -113,6 +113,10 @@ class OverloadedFunction {
 class Overloads_ {
 	fns: Map<string, Array<OverloadedFunction>>;
 
+	constructor() {
+		this.fns = new Map<string, Array<OverloadedFunction>>();
+	}
+
 	add(
 		name: string,
 		types: Array<TypeID>,

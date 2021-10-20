@@ -5,7 +5,7 @@ import { parseUncertain } from "./uncertain";
 
 export function parseNumericToken(stream: StringStream): Token {
 	let num = parseUncertain(stream);
-	if(num !== undefined) {
+	if(num !== undefined && num[0] !== undefined && num[1] !== undefined) {
 		return new TokenNumber(new NumberWrapper(num[0]));
 	}
 	return undefined;

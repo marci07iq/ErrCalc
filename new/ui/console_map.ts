@@ -6,14 +6,12 @@ declare global {
     interface Window {
 		parseExpression: any;
 		StringStream: any;
-		scope: any;
+		globalScope: any;
 	}
 }
 
-window.onload = () => {
-	window.parseExpression = window.parseExpression || parseExpression;
-	window.StringStream = window.StringStream || StringStream;
-	window.StringStream = window.StringStream || globalScope;
-}
-
+window.parseExpression = window.parseExpression || parseExpression;
+window.StringStream = window.StringStream || StringStream;
+window.globalScope = window.globalScope || globalScope;
+window.name = "ASD";
 console.log("Hello world");

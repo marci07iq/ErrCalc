@@ -2,9 +2,9 @@ import { ParserError } from "../parser/parser_error";
 
 export const whitespace = " \t\n\r"; //Space, tab, newline
 
-export function checkChar(char: string, chars: string) {
+export function checkChar(char: string, chars: string): boolean {
 	if(char.length != 1) return false;
-	return chars.indexOf(char);
+	return chars.indexOf(char) != -1;
 }
 
 export class StringStream {
@@ -15,9 +15,9 @@ export class StringStream {
 
 	constructor(str: string, parent?: StringStream) {
 		this.str = (parent?.str ?? str);
-		this.pos = (parent?.pos ?? 0);
+		this.pos = (parent?.pos ?? 0) + 0;
 		this.parent = parent;
-		this.parent_split_pos = this.parent?.pos;
+		this.parent_split_pos = this.parent?.pos + 0;
 	}
 
 	//At least one character can still be read
@@ -68,9 +68,9 @@ export class StringStream {
 			throw Error("Commiting into moved stream.");
 		}
 		//Write back postion
-		this.parent.pos = this.pos;
+		this.parent.pos = this.pos+0;
 		//
-		this.parent_split_pos = this.parent.pos;
+		this.parent_split_pos = this.parent.pos+0;
 	}
 
 	error(message) {
