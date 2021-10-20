@@ -1,7 +1,7 @@
-import { AlgebraBase, Numeric, getMagnitude, printNumber, printInt } from "./numeric";
+/*import { AlgebraBase, Type, getMagnitude, printNumber, printInt } from "./numeric";
 import { FormatType, settings } from "../settings/settings";
 
-export class Tensor<Underlying extends Numeric<Underlying>> implements Numeric<Tensor<Underlying>> {
+export class Tensor<Underlying extends Type> implements Type {
 	static algebra: AlgebraTensor_<Underlying>;
 
 	get_algebra(): AlgebraBase<Tensor<Underlying>> {
@@ -68,7 +68,7 @@ export class Tensor<Underlying extends Numeric<Underlying>> implements Numeric<T
 	}
 }
 
-class AlgebraTensor_<Underlying extends Numeric<Underlying>> extends AlgebraBase<Tensor<Underlying>> {
+class AlgebraTensor_<Underlying extends Type<Underlying>> extends AlgebraBase<Tensor<Underlying>> {
 	//Static factory
 	factory(val: number): Tensor<Underlying> {
 		return new Tensor(val, 0);
@@ -123,7 +123,7 @@ class AlgebraTensor_<Underlying extends Numeric<Underlying>> extends AlgebraBase
 	}
 	/*log(lhs: Tensor<Underlying>, rhs: Tensor<Underlying>): Tensor<Underlying> {
 		return this.div(this.loge(lhs), this.loge(rhs));
-	}*/
+	}*
 
 	//Trig
 	sin(lhs: Tensor<Underlying>): Tensor<Underlying> {
@@ -158,7 +158,7 @@ class AlgebraTensor_<Underlying extends Numeric<Underlying>> extends AlgebraBase
 	};
 	csc(lhs: Tensor<Underlying>): Tensor<Underlying> {
 		return new Tensor(1/Math.sin(lhs.val));
-	};*/
+	};*
 };
 
-Tensor.algebra = new AlgebraTensor_();
+Tensor.algebra = new AlgebraTensor_();*/

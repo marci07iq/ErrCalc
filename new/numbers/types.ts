@@ -1,19 +1,31 @@
-import { TokenNumber } from "../evaluator/token";
 import { FormatType } from "../settings/settings";
-import { StringStream } from "../utils/string_stream";
 
-export class TypeTrain {
-	name: string;
-}
-
-enum Types {
-	Basic,
+export enum TypeID {
+	BigInt,
+	BigRational,
+	Number,
+	BigFloat,
 	Uncertain,
+	Complex,
+	Unit,
+	Tensor,
+	Array
+};
+
+export interface TypeConverter {
+	fn: (val: Type) => Type;
+	weight: number;
 }
+export interface TypeTrait {
+	id: TypeID;
+	name: string;
+	converters: Map<TypeID, TypeConverter>;
+}
+
+export const Types: Map<TypeID, TypeTrait> = new Map<TypeID, TypeTrait>();
 
 export interface Type {
-	//get_algebra(): AlgebraBase;
-	//get_type(): Types;
+	get_type(): TypeTrait;
 
 	//Print
 	print_text(): string;
@@ -72,46 +84,29 @@ export interface Type {
 		return this.div(this.factory(1), this.sin(lhs));
 	};
 }*/
-
-/*export type Typecaster = (val: Type) => Type;
-
-function defaultCast(val: Type): Type {
-	return val;
-}
-
-class Typecasters_ {
-	//from type, to type
-	casters: Map<Types, Map<Types, Typecaster>>;
-
-	add(from: Types, to: Types, fn: Typecaster) {
-		if(!this.casters.has(from)) {
-			this.casters.set(from, new Map<Types, Typecaster>([[from, defaultCast]]));
-		}
-		let casters_from = this.casters.get(from);
-
-		casters_from.set(to, fn);
-	}
-}
-
-export let Typecasters = new Typecasters_();
-
 class OverloadedFunction {
-	types: Array<Types>;
-	match: Array<Array<Types>>;
+	types: Array<TypeID>;
 	fn: (args: Array<any>) => Type;
 
 	constructor(
-		types: Array<Types>,
+		types: Array<TypeID>,
 		fn: (args: Array<any>) => Type,
-		match?: Array<Array<Types>>
+		match?: Array<Array<TypeID>>
 		) {
 		this.types = types;
 		this.fn = fn;
-		this.match = match ?? (types.map(t => [t]));
 	}
 
-	call(vals: Array<Type>) {
+	call(vals: Array<Type>): Type {
+		let transmuted = vals.map((val, idx) => {
+			let srctypeid = val.get_type();
+			if(srctypeid.id == this.types[idx]) return val;
+			let caster = srctypeid.converters.get(idx);
+			if(caster === undefined) throw new Error("Can not convert " + (Types.get(srctypeid.id)?.name ?? "Unknown") + " to " + (Types.get(this.types[idx])?.name ?? "Unknown"));
+			return caster.fn(val);
+		});
 
+		return this.fn(transmuted);
 	}
 };
 
@@ -120,7 +115,7 @@ class Overloads_ {
 
 	add(
 		name: string,
-		types: Array<Types>,
+		types: Array<TypeID>,
 		fn: (args: Array<any>) => Type) {
 		if(!this.fns.has(name)) {
 			this.fns.set(name, new Array<OverloadedFunction>());
@@ -128,31 +123,37 @@ class Overloads_ {
 		this.fns.get(name).push(new OverloadedFunction(types, fn));
 	}
 
-	call(
+	find(
 		name: string,
-		args: Array<Type>
-	): Type {
+		args: Array<TypeID>
+	): OverloadedFunction {
 		let overloads = this.fns.get(name);
-		if(overloads === undefined) {
-			throw Error("Unknown builting function " + name);
-		}
+		if(overloads === undefined) throw new Error("Unknown builtin function " + name);
+		
+		let best: OverloadedFunction = undefined;
+		let bestweight: number = undefined;
 
-		let arg_casters = args.map(arg => {
-			return Typecasters.casters.get(arg.get_type());
-		})
+		overloads.forEach((overload) => {
+			if(overload.types.length == args.length) {
+				let wt = 0;
+				for(let i = 0; i < args.length; i++) {
+					let converter = Types.get(overload.types[i])?.converters.get(args[i])?.weight;
+					if(converter === undefined) return;
+					wt += converter;
+				}
+				if(best === undefined || bestweight > wt) {
+					best = overload;
+					bestweight = wt;
+				}
+			}
+		});
 
-		for(let i = 0; i = overloads.length; i++) {
-			if(overloads[i].types.length !== args.length) {
-				continue;
-			}
-			//let res = caster
-			for(let j = 0; j = overloads[i].types.length; j++) {
-				let caster = arg_casters[j].get(overloads[i].types[j])
-			}
-		}
+		if(best === undefined) throw new Error("No overload found for " + name + "(" + args.map(arg => (Types.get(arg)?.name ?? "Unknown")).join(", ") + ")");
+		return best;
 	}
 }
-*/
+
+export const Overloads: Overloads_ = new Overloads_;
 
 /*export abstract class AlgebraBase {
 	//Static factory

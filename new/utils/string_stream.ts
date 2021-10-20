@@ -72,4 +72,8 @@ export class StringStream {
 		//
 		this.parent_split_pos = this.parent.pos;
 	}
+
+	error(message) {
+		throw new ParserError(this.pos, this, message);
+	}
 }

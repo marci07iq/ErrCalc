@@ -1,5 +1,4 @@
 import { StringStream } from "../utils/string_stream";
-import { ParserError } from "./parser_error";
 
 //
 // Digit parser
@@ -122,7 +121,7 @@ export function parseFloat(stream: StringStream): number {
 		//Prevent a single dot from being a number
 		// .1 and 1. are valid
 		if (frac_num.numdgts == 0 && main_num.numdgts == 0) {
-			throw new ParserError(s.pos - 1, s, "No digits found around decimal point");
+			s.error("No digits found around decimal point");
 			return undefined;
 		} else {
 			//Add fractional part

@@ -1,7 +1,5 @@
 import { parseScientific } from "./number";
 import { StringStream } from "../utils/string_stream";
-import { ParserError } from "./parser_error";
-
 
 //
 // Error symbol parser
@@ -36,7 +34,7 @@ export function parseUncertain(stream: StringStream) {
 		err = parseScientific(s);
 
 		if(err === undefined) {
-			throw new ParserError(s.pos, s, "No number found after plus minus");
+			s.error("No number found after uncertaintly symbol");
 			return undefined;
 		}
 

@@ -1,16 +1,22 @@
-import { AlgebraBase, Numeric, printNumber } from "./numeric";
+import { Type, TypeID, printNumber, TypeTrait, TypeConverter, Types, Overloads, } from "./types";
 import { FormatType, settings } from "../settings/settings";
 
-export class Basic implements Numeric<Basic> {
-	static algebra: AlgebraBasic_;
+const trait: TypeTrait = {
+	id: TypeID.Number,
+	name: "Number",
+	converters: new Map<TypeID, TypeConverter>([
 
-	get_algebra(): AlgebraBase<Basic> {
-		return Basic.algebra;
-	}
+	])
+};
 
+Types.set(trait.id, trait);
+
+export class NumberWrapper implements Type {
 	val: number;
 
-
+	get_type(): TypeTrait {
+		return trait;
+	}
 
 	constructor(val: number) {
 		this.val = val;
@@ -23,81 +29,110 @@ export class Basic implements Numeric<Basic> {
 	print_text(): string {
 		return "" + this.val;
 	}
-}
-
-class AlgebraBasic_ extends AlgebraBase<Basic> {
-	//Static factory
-	factory(val: number): Basic {
-		return new Basic(val);
-	}
-
-	//Basic
-	add(lhs: Basic, rhs: Basic): Basic {
-		return new Basic(lhs.val + rhs.val);
-	}
-	sub(lhs: Basic, rhs: Basic): Basic {
-		return new Basic(lhs.val - rhs.val);
-	}
-	mul(lhs: Basic, rhs: Basic): Basic {
-		return new Basic(lhs.val * rhs.val);
-	}
-	div(lhs: Basic, rhs: Basic): Basic {
-		return new Basic(lhs.val / rhs.val);
-	}
-
-	//Exponential
-	pow(lhs: Basic, rhs: Basic): Basic {
-		return new Basic(Math.pow(lhs.val, rhs.val));
-	}
-	log(lhs: Basic, rhs: Basic): Basic{
-		return new Basic(Math.log(lhs.val) / Math.log(rhs.val));
-	}
-
-	sqrt(lhs: Basic): Basic {
-		return new Basic(Math.sqrt(lhs.val));
-	}
-	exp(lhs: Basic): Basic {
-		return new Basic(Math.exp(lhs.val));
-	}
-	log2(lhs: Basic): Basic {
-		return new Basic(Math.log2(lhs.val));
-	}
-	loge(lhs: Basic): Basic {
-		return new Basic(Math.log(lhs.val));
-	}
-	log10(lhs: Basic): Basic {
-		return new Basic(Math.log10(lhs.val));
-	}
-
-	//Trig
-	sin(lhs: Basic): Basic{
-		return new Basic(Math.sin(lhs.val));
-	}
-	cos(lhs: Basic): Basic{
-		return new Basic(Math.cos(lhs.val));
-	}
-	asin(lhs: Basic): Basic{
-		return new Basic(Math.asin(lhs.val));
-	}
-	acos(lhs: Basic): Basic{
-		return new Basic(Math.acos(lhs.val));
-	}
-	atan(lhs: Basic): Basic{
-		return new Basic(Math.atan(lhs.val));
-	}
-
-	tan(lhs: Basic): Basic {
-		return new Basic(Math.tan(lhs.val));
-	};
-	ctg(lhs: Basic): Basic {
-		return new Basic(1/Math.tan(lhs.val));
-	};
-	sec(lhs: Basic): Basic {
-		return new Basic(1/Math.cos(lhs.val));
-	};
-	csc(lhs: Basic): Basic {
-		return new Basic(1/Math.sin(lhs.val));
-	};
 };
 
-Basic.algebra = new AlgebraBasic_();
+//Basic operators
+
+Overloads.add("\\add", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<NumberWrapper>;
+	return new NumberWrapper(vst[0].val + vst[1].val);
+});
+
+Overloads.add("\\sub", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<NumberWrapper>;
+	return new NumberWrapper(vst[0].val - vst[1].val);
+});
+
+Overloads.add("\\mul", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<NumberWrapper>;
+	return new NumberWrapper(vst[0].val * vst[1].val);
+});
+
+Overloads.add("\\div", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<NumberWrapper>;
+	return new NumberWrapper(vst[0].val / vst[1].val);
+});
+
+//Powers and logarithms
+
+Overloads.add("sqrt", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<NumberWrapper>;
+	return new NumberWrapper(Math.sqrt(vst[0].val));
+});
+
+Overloads.add("exp", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<NumberWrapper>;
+	return new NumberWrapper(Math.exp(vst[0].val));
+});
+
+Overloads.add("pow", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<NumberWrapper>;
+	return new NumberWrapper(Math.pow(vst[0].val, vst[1].val));
+});
+
+Overloads.add("ln", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<NumberWrapper>;
+	return new NumberWrapper(Math.log(vst[0].val));
+});
+
+Overloads.add("log", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<NumberWrapper>;
+	return new NumberWrapper(Math.log(vst[0].val) / Math.log(vst[1].val));
+});
+
+Overloads.add("log2", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<NumberWrapper>;
+	return new NumberWrapper(Math.log(vst[0].val) / Math.LN2);
+});
+
+Overloads.add("log10", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<NumberWrapper>;
+	return new NumberWrapper(Math.log(vst[0].val) / Math.LN10);
+});
+
+//Trig shit
+
+Overloads.add("sin", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<NumberWrapper>;
+	return new NumberWrapper(Math.sin(vst[0].val));
+});
+
+Overloads.add("cos", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<NumberWrapper>;
+	return new NumberWrapper(Math.cos(vst[0].val));
+});
+
+Overloads.add("tan", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<NumberWrapper>;
+	return new NumberWrapper(Math.tan(vst[0].val));
+});
+
+Overloads.add("asin", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<NumberWrapper>;
+	return new NumberWrapper(Math.asin(vst[0].val));
+});
+
+Overloads.add("acos", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<NumberWrapper>;
+	return new NumberWrapper(Math.asin(vst[0].val));
+});
+
+Overloads.add("atan", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<NumberWrapper>;
+	return new NumberWrapper(Math.asin(vst[0].val));
+});
+
+Overloads.add("ctg", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<NumberWrapper>;
+	return new NumberWrapper(1 / Math.tan(vst[0].val));
+});
+
+Overloads.add("sec", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<NumberWrapper>;
+	return new NumberWrapper(1 / Math.cos(vst[0].val));
+});
+
+Overloads.add("csc", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<NumberWrapper>;
+	return new NumberWrapper(1 / Math.sin(vst[0].val));
+});

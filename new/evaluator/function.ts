@@ -1,4 +1,4 @@
-import { Type } from "../numbers/types";
+import { Overloads, Type } from "../numbers/types";
 import { Scope } from "./scope";
 import { Token } from "./token";
 
@@ -40,14 +40,15 @@ export class FunctionUser extends Function {
 }
 
 class FunctionBuiltinAlgebra extends Function {
+	name: string;
+	constructor(name: string) {
+		super();
+		this.name = name;
+	}
 
 	evaluate(scope: Scope, args: Array<Token>): Type {
-		if (args.length != 2) {
-			throw new Error("Invaild arguments for add");
-		}
-		return this.algebra.add(
-			args[0].evaluate(scope),
-			args[1].evaluate(scope)
-		);
+		let argsv = args.map(arg => arg.evaluate(scope));
+		let overload = Overloads.find(this.name, argsv.map(argv => argv.get_type().id));
+		return overload.call(argsv);
 	}
 }

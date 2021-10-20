@@ -1,24 +1,25 @@
-import { AlgebraBase, Numeric, getMagnitude, printNumber, printInt } from "./numeric";
+/*import { Type, getMagnitude, printNumber, printInt, TypeSystem } from "./types";
 import { FormatType, settings } from "../settings/settings";
+import { parseUncertain } from "../parser/uncertain";
+import { TokenNumber } from "../evaluator/token";
+import { StringStream } from "../utils/string_stream";
+import { Basic } from "./basic";
 
-export class Uncertain implements Numeric<Uncertain> {
-	static algebra: AlgebraUncertain_;
 
-	get_algebra(): AlgebraBase<Uncertain> {
-		return Uncertain.algebra;
-	}
+export class Uncertain implements Type {
+	static algebra: TypeSystemUncertain_;
 
-	val: number;
-	err: number;
+	val: Basic;
+	err: Basic;
 
-	constructor(val: number, err: number) {
+	constructor(val: Basic, err: Basic) {
 		this.val = val;
 		this.err = err;
 	}
 
 	print_parts(): Array<string> {
-		let num_magnitude: number = getMagnitude(this.val);
-		let err_magnitude: number = getMagnitude(this.val);
+		let num_magnitude: number = getMagnitude(this.val.val);
+		let err_magnitude: number = getMagnitude(this.err.val);
 
 		let format = settings.format;
 
@@ -68,10 +69,16 @@ export class Uncertain implements Numeric<Uncertain> {
 	}
 }
 
-class AlgebraUncertain_ extends AlgebraBase<Uncertain> {
+class TypeSystemUncertain_ extends TypeSystem {
 	//Static factory
 	factory(val: number): Uncertain {
 		return new Uncertain(val, 0);
+	}
+
+	parseNumber(stream: StringStream): TokenNumber {
+		let res = parseUncertain(stream);
+		if(res === undefined) return undefined;
+		return new TokenNumber(new Uncertain(res[0], res[1]));
 	}
 
 	//Uncertain
@@ -123,7 +130,7 @@ class AlgebraUncertain_ extends AlgebraBase<Uncertain> {
 	}
 	/*log(lhs: Uncertain, rhs: Uncertain): Uncertain{
 		return this.div(this.loge(lhs), this.loge(rhs));
-	}*/
+	}*
 
 	//Trig
 	sin(lhs: Uncertain): Uncertain{
@@ -158,7 +165,7 @@ class AlgebraUncertain_ extends AlgebraBase<Uncertain> {
 	};
 	csc(lhs: Uncertain): Uncertain {
 		return new Uncertain(1/Math.sin(lhs.val));
-	};*/
+	};*
 };
 
-Uncertain.algebra = new AlgebraUncertain_();
+Uncertain.algebra = new TypeSystemUncertain_();*/
