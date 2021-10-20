@@ -2,7 +2,7 @@ import { Type } from "../numbers/types";
 import { Token, TokenFunction, TokenNumber, TokenVar } from "../evaluator/token";
 import { StringStream, checkChar } from "../utils/string_stream";
 import { charmap } from "./charmap";
-import { parseNumericToken } from "./parser";
+import { parseNumericToken } from "./number_token";
 
 //Parse a valid operator name
 function parseOperatorSymbol(stream: StringStream): string {
@@ -188,6 +188,7 @@ const precedence: Array<PrecedenceClass> = [
 	},
 	{
 		symbols: new Map<string, string>([
+			["+", "\\pos"],
 			["-", "\\neg"]
 		]),
 		parser: parseOpUnaryL
@@ -205,7 +206,7 @@ precedence.forEach((p) => {
 	});
 });
 
-function parseExpression(stream: StringStream): Token {
+export function parseExpression(stream: StringStream): Token {
 	stream.skipThrough();
 
 	return precedence[0].parser(stream, 0);

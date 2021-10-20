@@ -137,7 +137,11 @@ class Overloads_ {
 			if(overload.types.length == args.length) {
 				let wt = 0;
 				for(let i = 0; i < args.length; i++) {
+					//Exact match
+					if(overload.types[i] == args[i]) continue;
+					//Need conversion
 					let converter = Types.get(overload.types[i])?.converters.get(args[i])?.weight;
+					//None found: Ignore this option
 					if(converter === undefined) return;
 					wt += converter;
 				}

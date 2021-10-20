@@ -39,7 +39,7 @@ export class FunctionUser extends Function {
 	}
 }
 
-class FunctionBuiltinAlgebra extends Function {
+export class FunctionBuiltinAlgebra extends Function {
 	name: string;
 	constructor(name: string) {
 		super();

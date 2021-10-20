@@ -3,6 +3,7 @@ import { Type } from "../numbers/types";
 
 export interface Token {
 	evaluate(scope: Scope): Type;
+	debug_write(): string;
 }
 
 export class TokenNumber implements Token {
@@ -14,6 +15,9 @@ export class TokenNumber implements Token {
 
 	evaluate(scope: Scope): Type {
 		return this.val;
+	}
+	debug_write(): string {
+		return "Number " + this.val.print_text();
 	}
 }
 
@@ -30,6 +34,9 @@ export class TokenVar implements Token {
 			throw new Error("Unknown symbol " + this.name);
 		}
 		return res;
+	}
+	debug_write(): string {
+		return "Var " + this.name;
 	}
 }
 
@@ -48,5 +55,8 @@ export class TokenFunction implements Token {
 			throw new Error("Unknown symbol " + this.name);
 		}
 		return res.evaluate(scope, this.args);
+	}
+	debug_write(): string {
+		return "Fn " + this.name + "(" + this.args.map((arg) => arg.debug_write()).join(", ") + ")";
 	}
 }
