@@ -24,21 +24,21 @@ export class Scope {
 		this.fns_public = new Map<string, Function>();
 	}
 
-	getVarTrace(name: string): Type {
+	private getVarTrace(name: string): Type | undefined {
 		return this.vars_public.get(name) ?? this.parent?.getVarTrace(name);
 	}
 
-	getFnTrace(name: string): Function {
+	private getFnTrace(name: string): Function | undefined {
 		return this.fns_public.get(name) ?? this.parent?.getFnTrace(name);
 	}
 
 
 
-	getVar(name: string): Type {
+	getVar(name: string): Type | undefined{
 		return this.vars_private.get(name) ?? this.getVarTrace(name);
 	}
 
-	getFn(name: string): Function {
+	getFn(name: string): Function | undefined{
 		return this.fns_private.get(name) ?? this.getFnTrace(name);
 	}
 }

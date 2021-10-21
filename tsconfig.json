@@ -1,11 +1,12 @@
 {
 	"compilerOptions": {
 		"module": "amd",
-		"target": "es6",
+		"target": "es2020",
 		"jsx": "preserve",
 		"strictFunctionTypes": true,
 		"sourceMap": true,
-		"outFile": "./build/build.js"
+		"outFile": "./build/build.js",
+		"strictNullChecks": true
 	},
 	"include": [
 		"new"

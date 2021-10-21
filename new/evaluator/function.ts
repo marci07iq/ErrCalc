@@ -48,7 +48,6 @@ export class FunctionBuiltinAlgebra extends Function {
 
 	evaluate(scope: Scope, args: Array<Token>): Type {
 		let argsv = args.map(arg => arg.evaluate(scope));
-		let overload = Overloads.find(this.name, argsv.map(argv => argv.get_type().id));
-		return overload.call(argsv);
+		return Overloads.call(this.name, argsv);
 	}
 }

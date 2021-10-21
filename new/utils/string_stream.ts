@@ -17,7 +17,7 @@ export class StringStream {
 		this.str = (parent?.str ?? str);
 		this.pos = (parent?.pos ?? 0) + 0;
 		this.parent = parent;
-		this.parent_split_pos = this.parent?.pos + 0;
+		this.parent_split_pos = (this.parent?.pos !== undefined) ? this.parent?.pos + 0 : undefined;
 	}
 
 	//At least one character can still be read

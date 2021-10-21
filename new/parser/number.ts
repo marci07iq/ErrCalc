@@ -8,7 +8,7 @@ function isDigit(char: string): boolean {
 	return '0' <= char && char <= '9';
 }
 
-function parseDigit(stream: StringStream): number {
+function parseDigit(stream: StringStream): number | undefined {
 	let char = stream.peek(1);
 
 	if (isDigit(char)) {
@@ -64,20 +64,19 @@ function parseExponentialSymbol(stream: StringStream): boolean {
 }
 
 //Parse sequence of digits
-
-interface parseDigitsResult {
-	num: number;
-	numdgts: number;
+interface parseUIntResult {
+	num: bigint;
+	numdgts: number; //We really dont need to worry about overflows here
 }
 
-function parseDigits(stream: StringStream): parseDigitsResult {
-	let num: number = 0;
+function parseUInt(stream: StringStream): parseUIntResult {
+	let num: bigint = 0n;
 	let numdgts: number = 0;
 
-	let dgt = undefined;
+	let dgt: number | undefined = undefined;
 
-	while ((dgt = parseDigit(stream)) != undefined) {
-		num = 10 * num + dgt;
+	while ((dgt = parseDigit(stream)) !== undefined) {
+		num = 10n * num + BigInt(dgt);
 		numdgts++;
 	}
 
@@ -87,36 +86,36 @@ function parseDigits(stream: StringStream): parseDigitsResult {
 	};
 }
 
-interface parseSignedResult {
-	num: number;
+interface parseIntResult {
+	num: bigint;
 	numdgts: number;
 	sign: number;
 }
 
-function parseSigned(stream: StringStream): parseSignedResult {
+function parseInt(stream: StringStream): parseIntResult {
 	let sign = parseSign(stream);
 
-	let main_num: parseDigitsResult = parseDigits(stream);
+	let main_num: parseUIntResult = parseUInt(stream);
 
 	return {
-		num: main_num.num * sign,
+		num: main_num.num * BigInt(sign),
 		numdgts: main_num.numdgts,
 		sign: sign
 	};
 }
 
-export function parseFloat(stream: StringStream): number {
+export function parseUFloat(stream: StringStream): number | bigint | undefined {
 	let s = stream.transaction();
 
-	let main_num = parseSigned(s);
+	let main_num = parseUInt(s);
 
-	let num = main_num.num;
+	let num : number | bigint = main_num.num;
 
 	//Handle fraction
 	if (s.peek(1) == ".") {
 		s.get(1);
 
-		let frac_num: parseDigitsResult = parseDigits(s);
+		let frac_num: parseUIntResult = parseUInt(s);
 
 		//Prevent a single dot from being a number
 		// .1 and 1. are valid
@@ -125,7 +124,7 @@ export function parseFloat(stream: StringStream): number {
 			return undefined;
 		} else {
 			//Add fractional part
-			num += main_num.sign * frac_num.num / Math.pow(10, frac_num.numdgts);
+			num = Number(num) + Number(frac_num.num) / Math.pow(10, frac_num.numdgts);
 		}
 	} else {
 		if (main_num.numdgts == 0) {
@@ -137,8 +136,8 @@ export function parseFloat(stream: StringStream): number {
 	return num;
 }
 
-export function parseScientific(stream: StringStream): number {
-	let float = parseFloat(stream);
+export function parseScientific(stream: StringStream): number | bigint | undefined {
+	let float = parseUFloat(stream);
 
 	if (float === undefined) {
 		return undefined;
@@ -146,10 +145,18 @@ export function parseScientific(stream: StringStream): number {
 	let s = stream.transaction();
 	if (parseExponentialSymbol(s)) {
 
-		let num_exp = parseSigned(s);
+		let num_exp = parseInt(s);
 
 		if (num_exp.numdgts > 0) {
-			float *= Math.pow(10, num_exp.num);
+			if(num_exp.num >= 0) {
+				if(typeof float == "bigint") {
+					float = float * (10n ** num_exp.num);
+				} else {
+					float = float * (10 ** Number(num_exp.num));
+				}
+			} else {
+				float = Number(float) * (10 ** Number(num_exp.num));
+			}
 			s.commit();
 		}
 
