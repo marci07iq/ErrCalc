@@ -142,43 +142,48 @@ export class TypeNumber implements Type {
 
 export type TypeBasic = TypeBigInt | TypeBigRational | TypeNumber;
 
-export const OverloadsBasic = new Overloads<TypeBasic, TypeBasic>();
+export const OverloadBasic = new Overloads<TypeBasic, TypeBasic>();
 
 //Alegbra operators
 
 //BigInt
 
-OverloadsBasic.add("add", [TypeID.BigInt, TypeID.BigInt], (vs) => {
+OverloadBasic.add("neg", [TypeID.BigInt], (vs) => {
+	let vst = vs as Array<TypeBigInt>;
+	return new TypeBigInt(vst[0].val < 0 ? -vst[0].val : vst[0].val);
+});
+
+OverloadBasic.add("add", [TypeID.BigInt, TypeID.BigInt], (vs) => {
 	let vst = vs as Array<TypeBigInt>;
 	return new TypeBigInt(vst[0].val + vst[1].val);
 });
 
-OverloadsBasic.add("pos", [TypeID.BigInt], (vs) => {
+OverloadBasic.add("pos", [TypeID.BigInt], (vs) => {
 	let vst = vs as Array<TypeBigInt>;
 	return vst[0];
 });
 
-OverloadsBasic.add("sub", [TypeID.BigInt, TypeID.BigInt], (vs) => {
+OverloadBasic.add("sub", [TypeID.BigInt, TypeID.BigInt], (vs) => {
 	let vst = vs as Array<TypeBigInt>;
 	return new TypeBigInt(vst[0].val - vst[1].val);
 });
 
-OverloadsBasic.add("neg", [TypeID.BigInt], (vs) => {
+OverloadBasic.add("neg", [TypeID.BigInt], (vs) => {
 	let vst = vs as Array<TypeBigInt>;
 	return new TypeBigInt(-vst[0].val);
 });
 
-OverloadsBasic.add("mul", [TypeID.BigInt, TypeID.BigInt], (vs) => {
+OverloadBasic.add("mul", [TypeID.BigInt, TypeID.BigInt], (vs) => {
 	let vst = vs as Array<TypeBigInt>;
 	return new TypeBigInt(vst[0].val * vst[1].val);
 });
 
-OverloadsBasic.add("div", [TypeID.BigInt, TypeID.BigInt], (vs) => {
+OverloadBasic.add("div", [TypeID.BigInt, TypeID.BigInt], (vs) => {
 	let vst = vs as Array<TypeBigInt>;
 	return new TypeBigRational(vst[0].val, vst[1].val);
 });
 
-OverloadsBasic.add("pow", [TypeID.BigInt, TypeID.BigInt], (vs) => {
+OverloadBasic.add("pow", [TypeID.BigInt, TypeID.BigInt], (vs) => {
 	let vst = vs as Array<TypeBigInt>;
 	if(vst[1].val >= 0) {
 		return new TypeBigInt(vst[0].val ** vst[1].val);
@@ -189,37 +194,45 @@ OverloadsBasic.add("pow", [TypeID.BigInt, TypeID.BigInt], (vs) => {
 
 //BigRational
 
-OverloadsBasic.add("add", [TypeID.BigRational, TypeID.BigRational], (vs) => {
+OverloadBasic.add("abs", [TypeID.BigRational], (vs) => {
+	let vst = vs as Array<TypeBigRational>;
+	return new TypeBigRational(
+		vst[0].num < 0 ? -vst[0].num : vst[0].num,
+		vst[1].den
+	);
+});
+
+OverloadBasic.add("add", [TypeID.BigRational, TypeID.BigRational], (vs) => {
 	let vst = vs as Array<TypeBigRational>;
 	return new TypeBigRational(vst[0].num * vst[1].den + vst[1].num * vst[0].den, vst[0].den * vst[1].den);
 });
 
-OverloadsBasic.add("pos", [TypeID.BigRational], (vs) => {
+OverloadBasic.add("pos", [TypeID.BigRational], (vs) => {
 	let vst = vs as Array<TypeBigRational>;
 	return vst[0];
 });
 
-OverloadsBasic.add("sub", [TypeID.BigRational, TypeID.BigRational], (vs) => {
+OverloadBasic.add("sub", [TypeID.BigRational, TypeID.BigRational], (vs) => {
 	let vst = vs as Array<TypeBigRational>;
 	return new TypeBigRational(vst[0].num * vst[1].den - vst[1].num * vst[0].den, vst[0].den * vst[1].den);
 });
 
-OverloadsBasic.add("neg", [TypeID.BigRational], (vs) => {
+OverloadBasic.add("neg", [TypeID.BigRational], (vs) => {
 	let vst = vs as Array<TypeBigRational>;
 	return new TypeBigRational(-vst[0].num, vst[0].den);
 });
 
-OverloadsBasic.add("mul", [TypeID.BigRational, TypeID.BigRational], (vs) => {
+OverloadBasic.add("mul", [TypeID.BigRational, TypeID.BigRational], (vs) => {
 	let vst = vs as Array<TypeBigRational>;
 	return new TypeBigRational(vst[0].num * vst[1].num, vst[0].den * vst[1].den);
 });
 
-OverloadsBasic.add("div", [TypeID.BigRational, TypeID.BigRational], (vs) => {
+OverloadBasic.add("div", [TypeID.BigRational, TypeID.BigRational], (vs) => {
 	let vst = vs as Array<TypeBigRational>;
 	return new TypeBigRational(vst[0].num * vst[1].den, vst[0].den * vst[1].num);
 });
 
-OverloadsBasic.add("pow", [TypeID.BigRational, TypeID.BigRational], (vs) => {
+OverloadBasic.add("pow", [TypeID.BigRational, TypeID.BigRational], (vs) => {
 	let vst = vs as Array<TypeBigRational>;
 	if(vst[1].den == 1n) {
 		if(vst[1].num >= 0) {
@@ -235,116 +248,121 @@ OverloadsBasic.add("pow", [TypeID.BigRational, TypeID.BigRational], (vs) => {
 
 //Basic operators
 
-OverloadsBasic.add("add", [TypeID.Number, TypeID.Number], (vs) => {
+OverloadBasic.add("abs", [TypeID.Number], (vs) => {
+	let vst = vs as Array<TypeNumber>;
+	return new TypeNumber(vst[0].val < 0 ? -vst[0].val : vst[0].val);
+});
+
+OverloadBasic.add("add", [TypeID.Number, TypeID.Number], (vs) => {
 	let vst = vs as Array<TypeNumber>;
 	return new TypeNumber(vst[0].val + vst[1].val);
 });
 
-OverloadsBasic.add("pos", [TypeID.Number], (vs) => {
+OverloadBasic.add("pos", [TypeID.Number], (vs) => {
 	let vst = vs as Array<TypeNumber>;
 	return vst[0];
 });
 
-OverloadsBasic.add("sub", [TypeID.Number, TypeID.Number], (vs) => {
+OverloadBasic.add("sub", [TypeID.Number, TypeID.Number], (vs) => {
 	let vst = vs as Array<TypeNumber>;
 	return new TypeNumber(vst[0].val - vst[1].val);
 });
 
-OverloadsBasic.add("neg", [TypeID.Number], (vs) => {
+OverloadBasic.add("neg", [TypeID.Number], (vs) => {
 	let vst = vs as Array<TypeNumber>;
 	return new TypeNumber(-vst[0].val);
 });
 
-OverloadsBasic.add("mul", [TypeID.Number, TypeID.Number], (vs) => {
+OverloadBasic.add("mul", [TypeID.Number, TypeID.Number], (vs) => {
 	let vst = vs as Array<TypeNumber>;
 	return new TypeNumber(vst[0].val * vst[1].val);
 });
 
-OverloadsBasic.add("div", [TypeID.Number, TypeID.Number], (vs) => {
+OverloadBasic.add("div", [TypeID.Number, TypeID.Number], (vs) => {
 	let vst = vs as Array<TypeNumber>;
 	return new TypeNumber(vst[0].val / vst[1].val);
 });
 
 //Powers and logarithms
 
-OverloadsBasic.add("sqrt", [TypeID.Number], (vs) => {
+OverloadBasic.add("sqrt", [TypeID.Number], (vs) => {
 	let vst = vs as Array<TypeNumber>;
 	return new TypeNumber(Math.sqrt(vst[0].val));
 });
 
-OverloadsBasic.add("exp", [TypeID.Number], (vs) => {
+OverloadBasic.add("exp", [TypeID.Number], (vs) => {
 	let vst = vs as Array<TypeNumber>;
 	return new TypeNumber(Math.exp(vst[0].val));
 });
 
-OverloadsBasic.add("pow", [TypeID.Number, TypeID.Number], (vs) => {
+OverloadBasic.add("pow", [TypeID.Number, TypeID.Number], (vs) => {
 	let vst = vs as Array<TypeNumber>;
 	return new TypeNumber(Math.pow(vst[0].val, vst[1].val));
 });
 
-OverloadsBasic.add("ln", [TypeID.Number], (vs) => {
+OverloadBasic.add("ln", [TypeID.Number], (vs) => {
 	let vst = vs as Array<TypeNumber>;
 	return new TypeNumber(Math.log(vst[0].val));
 });
 
-OverloadsBasic.add("log", [TypeID.Number, TypeID.Number], (vs) => {
+OverloadBasic.add("log", [TypeID.Number, TypeID.Number], (vs) => {
 	let vst = vs as Array<TypeNumber>;
 	return new TypeNumber(Math.log(vst[0].val) / Math.log(vst[1].val));
 });
 
-OverloadsBasic.add("log2", [TypeID.Number], (vs) => {
+OverloadBasic.add("log2", [TypeID.Number], (vs) => {
 	let vst = vs as Array<TypeNumber>;
 	return new TypeNumber(Math.log(vst[0].val) / Math.LN2);
 });
 
-OverloadsBasic.add("log10", [TypeID.Number], (vs) => {
+OverloadBasic.add("log10", [TypeID.Number], (vs) => {
 	let vst = vs as Array<TypeNumber>;
 	return new TypeNumber(Math.log(vst[0].val) / Math.LN10);
 });
 
 //Trig shit
 
-OverloadsBasic.add("sin", [TypeID.Number], (vs) => {
+OverloadBasic.add("sin", [TypeID.Number], (vs) => {
 	let vst = vs as Array<TypeNumber>;
 	return new TypeNumber(Math.sin(vst[0].val));
 });
 
-OverloadsBasic.add("cos", [TypeID.Number], (vs) => {
+OverloadBasic.add("cos", [TypeID.Number], (vs) => {
 	let vst = vs as Array<TypeNumber>;
 	return new TypeNumber(Math.cos(vst[0].val));
 });
 
-OverloadsBasic.add("tan", [TypeID.Number], (vs) => {
+OverloadBasic.add("tan", [TypeID.Number], (vs) => {
 	let vst = vs as Array<TypeNumber>;
 	return new TypeNumber(Math.tan(vst[0].val));
 });
 
-OverloadsBasic.add("asin", [TypeID.Number], (vs) => {
+OverloadBasic.add("asin", [TypeID.Number], (vs) => {
 	let vst = vs as Array<TypeNumber>;
 	return new TypeNumber(Math.asin(vst[0].val));
 });
 
-OverloadsBasic.add("acos", [TypeID.Number], (vs) => {
+OverloadBasic.add("acos", [TypeID.Number], (vs) => {
 	let vst = vs as Array<TypeNumber>;
 	return new TypeNumber(Math.asin(vst[0].val));
 });
 
-OverloadsBasic.add("atan", [TypeID.Number], (vs) => {
+OverloadBasic.add("atan", [TypeID.Number], (vs) => {
 	let vst = vs as Array<TypeNumber>;
 	return new TypeNumber(Math.asin(vst[0].val));
 });
 
-OverloadsBasic.add("ctg", [TypeID.Number], (vs) => {
+OverloadBasic.add("ctg", [TypeID.Number], (vs) => {
 	let vst = vs as Array<TypeNumber>;
 	return new TypeNumber(1 / Math.tan(vst[0].val));
 });
 
-OverloadsBasic.add("sec", [TypeID.Number], (vs) => {
+OverloadBasic.add("sec", [TypeID.Number], (vs) => {
 	let vst = vs as Array<TypeNumber>;
 	return new TypeNumber(1 / Math.cos(vst[0].val));
 });
 
-OverloadsBasic.add("csc", [TypeID.Number], (vs) => {
+OverloadBasic.add("csc", [TypeID.Number], (vs) => {
 	let vst = vs as Array<TypeNumber>;
 	return new TypeNumber(1 / Math.sin(vst[0].val));
 });

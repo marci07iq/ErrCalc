@@ -24,7 +24,7 @@ export function parseErrorSymbol(stream: StringStream): boolean {
 
 export function parseUncertain(stream: StringStream) {
 	let val = parseScientific(stream);
-	let err = 0;
+	let err: number | bigint | undefined = undefined;
 
 	let s = stream.transaction();
 

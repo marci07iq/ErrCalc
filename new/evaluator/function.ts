@@ -1,6 +1,10 @@
-import { Overloads, Type } from "../numbers/types";
+import { Type } from "../numbers/types";
 import { Scope } from "./scope";
 import { Token } from "./token";
+
+import { OverloadScalar } from "../numbers/scalar";
+
+export const globalOverload = OverloadScalar;
 
 export abstract class Function {
 	constructor() {
@@ -48,6 +52,6 @@ export class FunctionBuiltinAlgebra extends Function {
 
 	evaluate(scope: Scope, args: Array<Token>): Type {
 		let argsv = args.map(arg => arg.evaluate(scope));
-		return Overloads.call(this.name, argsv);
+		return globalOverload.call(this.name, argsv);
 	}
 }

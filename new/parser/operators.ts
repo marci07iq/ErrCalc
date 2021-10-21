@@ -5,7 +5,7 @@ import { charmap } from "./charmap";
 import { parseNumericToken } from "./number_token";
 
 //Parse a valid operator name
-function parseOperatorSymbol(stream: StringStream): string {
+function parseOperatorSymbol(stream: StringStream): string | undefined {
 	let res = "";
 	let good = false;
 	//While valid operator char
@@ -30,7 +30,7 @@ function parseOperatorSymbol(stream: StringStream): string {
 	return res;
 }
 
-function parseName(stream: StringStream): string {
+function parseName(stream: StringStream): string | undefined {
 	let res = "";
 	//While valid operator char
 	if (checkChar(stream.peek(), charmap.name_start)) {
@@ -47,7 +47,7 @@ function parseName(stream: StringStream): string {
 //Function to parse an operaotr class
 type operatorParser = (
 	stream: StringStream,
-	prec_class: number) => Token;
+	prec_class: number) => Token | undefined;
 
 class PrecedenceClass {
 	symbols: Map<string, string>; //symbol to useful name
@@ -56,7 +56,7 @@ class PrecedenceClass {
 
 function parsePrimitive(
 	stream: StringStream,
-	prec_class: number): Token {
+	prec_class: number): Token | undefined {
 
 	//Grammar:
 	//Number, name or bracket.
@@ -123,7 +123,7 @@ function parsePrimitive(
 
 function parseOpBinaryL2R(
 	stream: StringStream,
-	prec_class: number): Token {
+	prec_class: number): Token | undefined {
 	
 	//Grammar:
 	//<wh>Prec(+1)<wh>[op(0)<wh>Prec(+1)]...
@@ -131,6 +131,7 @@ function parseOpBinaryL2R(
 	let leading = precedence[prec_class + 1].parser(stream, prec_class + 1);
 	if(leading === undefined) {
 		stream.error("Expected token found nothing");
+		return;
 	}
 	let res = leading;
 
@@ -139,13 +140,19 @@ function parseOpBinaryL2R(
 		let s = stream.transaction();
 		let op = parseOperatorSymbol(s);
 		//This level
-		if(precedence[prec_class].symbols.has(op)) {
+		if(op !== undefined && precedence[prec_class].symbols.has(op)) {
 			let term = precedence[prec_class + 1].parser(s, prec_class + 1);
 			if(term === undefined) {
 				s.error("Binary " + op + " expected right argument, found nothing");
+				return;
 			}
 
-			res = new TokenFunction(precedence[prec_class].symbols.get(op), [res, term]);
+			let op_fn = precedence[prec_class].symbols.get(op);
+			if(op_fn === undefined) {
+				s.error("Impossible error: Parsed unknown operator " + op);
+				return;
+			}
+			res = new TokenFunction(op_fn, [res, term]);
 
 			s.commit();
 		} else {
@@ -158,7 +165,7 @@ function parseOpBinaryL2R(
 
 function parseOpBinaryR2L(
 	stream: StringStream,
-	prec_class: number): Token {
+	prec_class: number): Token | undefined {
 	
 	//Grammar:
 	//<wh>Prec(+1)<wh>[op(0)<wh>Prec(+1)]...
@@ -166,6 +173,7 @@ function parseOpBinaryR2L(
 	let leading = precedence[prec_class + 1].parser(stream, prec_class + 1);
 	if(leading === undefined) {
 		stream.error("Expected token found nothing");
+		return;
 	}
 	let res = leading;
 
@@ -173,14 +181,20 @@ function parseOpBinaryR2L(
 	let s = stream.transaction();
 	let op = parseOperatorSymbol(s);
 	//This level
-	if(precedence[prec_class].symbols.has(op)) {
+	if(op !== undefined &&precedence[prec_class].symbols.has(op)) {
 		//Parse RHS with self
 		let term = precedence[prec_class].parser(s, prec_class);
 		if(term === undefined) {
 			s.error("Binary " + op + " expected right argument, found nothing");
+			return;
 		}
 
-		res = new TokenFunction(precedence[prec_class].symbols.get(op), [res, term]);
+		let op_fn = precedence[prec_class].symbols.get(op);
+		if(op_fn === undefined) {
+			s.error("Impossible error: Parsed unknown operator " + op);
+			return;
+		}
+		res = new TokenFunction(op_fn, [res, term]);
 
 		s.commit();
 	}
@@ -190,7 +204,7 @@ function parseOpBinaryR2L(
 
 function parseOpUnaryL(
 	stream: StringStream,
-	prec_class: number): Token {
+	prec_class: number): Token | undefined {
 
 	//Unary prefix operator
 	//Grammar: [op(0)]+ token(+1)
@@ -198,14 +212,22 @@ function parseOpUnaryL(
 	s.skipThrough();
 	let op = parseOperatorSymbol(s);
 	//This level
-	if(precedence[prec_class].symbols.has(op)) {
+	if(op !== undefined && precedence[prec_class].symbols.has(op)) {
 		let term = precedence[prec_class].parser(s, prec_class);
 		if(term === undefined) {
 			s.error("Unary " + op + " expected right argument, found nothing");
+			return;
 		}
 		
 		s.commit();
-		return new TokenFunction(precedence[prec_class].symbols.get(op), [term]);
+
+		let op_fn = precedence[prec_class].symbols.get(op);
+		if(op_fn === undefined) {
+			s.error("Impossible error: Parsed unknown operator " + op);
+			return;
+		}
+
+		return new TokenFunction(op_fn, [term]);
 	} else {
 		return precedence[prec_class + 1].parser(stream, prec_class + 1);
 	}
@@ -250,7 +272,7 @@ precedence.forEach((prec_class) => {
 })
 
 
-export function parseExpression(stream: StringStream): Token {
+export function parseExpression(stream: StringStream): Token | undefined {
 	stream.skipThrough();
 
 	return precedence[0].parser(stream, 0);
@@ -273,6 +295,7 @@ function parseList(stream: StringStream): Array<Token> {
 		let exp = parseExpression(stream);
 		if(exp === undefined) {
 			stream.error("Expected token after ,");
+			return new Array<Token>();
 		}
 		res.push(exp);
 		stream.skipThrough();

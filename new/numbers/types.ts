@@ -160,7 +160,7 @@ export class Overloads<BaseType extends RetType, RetType extends Type> {
 					//Exact match
 					if(overload.types[i] == args[i]) continue;
 					//Need conversion
-					let converter = Types.get(args[i])?.converters.get(overload.types[i])?.weight;
+					let converter = Types.get(overload.types[i])?.converters.get(args[i])?.weight;
 					//None found: Ignore this option
 					if(converter === undefined) return;
 					wt += converter;
@@ -184,6 +184,8 @@ export class Overloads<BaseType extends RetType, RetType extends Type> {
 		let argst = args.map(arg => arg.get_type().id);
 		let overload = this.find(name, argst);
 		if(overload === undefined) throw new Error("No overload found for " + name + "(" + argst.map(argt => (Types.get(argt)?.name ?? "Unknown")).join(", ") + ")");
+		//console.debug("Looking for " + name + "(" + argst.map(argt => (Types.get(argt)?.name ?? "Unknown")).join(", ") + ")");
+		//console.debug("Found " + name + "(" + overload.fn.types.map(argt => (Types.get(argt)?.name ?? "Unknown")).join(", ") + ")");
 		return overload.fn.call(args);
 	}
 }

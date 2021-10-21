@@ -1,4 +1,4 @@
-import { NumberWrapper } from "../numbers/basic";
+import { TypeNumber } from "../numbers/basic";
 import { FunctionBuiltinAlgebra } from "./function";
 import { Scope } from "./scope";
 
@@ -26,5 +26,5 @@ globalScope.fns_public.set("ctg", new FunctionBuiltinAlgebra("ctg"));
 globalScope.fns_public.set("sec", new FunctionBuiltinAlgebra("sec"));
 globalScope.fns_public.set("csc", new FunctionBuiltinAlgebra("csc"));
 
-globalScope.vars_public.set("E", new NumberWrapper(Math.E));
-globalScope.vars_public.set("pi", new NumberWrapper(Math.PI));
+globalScope.vars_public.set("E", new TypeNumber(Math.E));
+globalScope.vars_public.set("pi", new TypeNumber(Math.PI));
