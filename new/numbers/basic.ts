@@ -140,50 +140,52 @@ export class TypeNumber implements Type {
 	}
 };
 
-export type TypeBasic = TypeBigInt | TypeBigRational | TypeNumber;
+export type TypeBasicClosed = TypeBigInt | TypeBigRational;
+export type TypeBasic = TypeBasicClosed | TypeNumber;
 
-export const OverloadBasic = new Overloads<TypeBasic, TypeBasic>();
+export const OverloadBasicClosed = new Overloads<TypeBasicClosed, TypeBasicClosed>();
+export const OverloadBasic = new Overloads<TypeBasicClosed, TypeBasic>(OverloadBasicClosed);
 
-//Alegbra operators
+//Alegbra operators (algebraically closed)
 
 //BigInt
 
-OverloadBasic.add("neg", [TypeID.BigInt], (vs) => {
+OverloadBasicClosed.add("abs", [TypeID.BigInt], (vs) => {
 	let vst = vs as Array<TypeBigInt>;
 	return new TypeBigInt(vst[0].val < 0 ? -vst[0].val : vst[0].val);
 });
 
-OverloadBasic.add("add", [TypeID.BigInt, TypeID.BigInt], (vs) => {
+OverloadBasicClosed.add("add", [TypeID.BigInt, TypeID.BigInt], (vs) => {
 	let vst = vs as Array<TypeBigInt>;
 	return new TypeBigInt(vst[0].val + vst[1].val);
 });
 
-OverloadBasic.add("pos", [TypeID.BigInt], (vs) => {
+OverloadBasicClosed.add("pos", [TypeID.BigInt], (vs) => {
 	let vst = vs as Array<TypeBigInt>;
 	return vst[0];
 });
 
-OverloadBasic.add("sub", [TypeID.BigInt, TypeID.BigInt], (vs) => {
+OverloadBasicClosed.add("sub", [TypeID.BigInt, TypeID.BigInt], (vs) => {
 	let vst = vs as Array<TypeBigInt>;
 	return new TypeBigInt(vst[0].val - vst[1].val);
 });
 
-OverloadBasic.add("neg", [TypeID.BigInt], (vs) => {
+OverloadBasicClosed.add("neg", [TypeID.BigInt], (vs) => {
 	let vst = vs as Array<TypeBigInt>;
 	return new TypeBigInt(-vst[0].val);
 });
 
-OverloadBasic.add("mul", [TypeID.BigInt, TypeID.BigInt], (vs) => {
+OverloadBasicClosed.add("mul", [TypeID.BigInt, TypeID.BigInt], (vs) => {
 	let vst = vs as Array<TypeBigInt>;
 	return new TypeBigInt(vst[0].val * vst[1].val);
 });
 
-OverloadBasic.add("div", [TypeID.BigInt, TypeID.BigInt], (vs) => {
+OverloadBasicClosed.add("div", [TypeID.BigInt, TypeID.BigInt], (vs) => {
 	let vst = vs as Array<TypeBigInt>;
 	return new TypeBigRational(vst[0].val, vst[1].val);
 });
 
-OverloadBasic.add("pow", [TypeID.BigInt, TypeID.BigInt], (vs) => {
+OverloadBasicClosed.add("pow", [TypeID.BigInt, TypeID.BigInt], (vs) => {
 	let vst = vs as Array<TypeBigInt>;
 	if(vst[1].val >= 0) {
 		return new TypeBigInt(vst[0].val ** vst[1].val);
@@ -194,7 +196,7 @@ OverloadBasic.add("pow", [TypeID.BigInt, TypeID.BigInt], (vs) => {
 
 //BigRational
 
-OverloadBasic.add("abs", [TypeID.BigRational], (vs) => {
+OverloadBasicClosed.add("abs", [TypeID.BigRational], (vs) => {
 	let vst = vs as Array<TypeBigRational>;
 	return new TypeBigRational(
 		vst[0].num < 0 ? -vst[0].num : vst[0].num,
@@ -202,32 +204,32 @@ OverloadBasic.add("abs", [TypeID.BigRational], (vs) => {
 	);
 });
 
-OverloadBasic.add("add", [TypeID.BigRational, TypeID.BigRational], (vs) => {
+OverloadBasicClosed.add("add", [TypeID.BigRational, TypeID.BigRational], (vs) => {
 	let vst = vs as Array<TypeBigRational>;
 	return new TypeBigRational(vst[0].num * vst[1].den + vst[1].num * vst[0].den, vst[0].den * vst[1].den);
 });
 
-OverloadBasic.add("pos", [TypeID.BigRational], (vs) => {
+OverloadBasicClosed.add("pos", [TypeID.BigRational], (vs) => {
 	let vst = vs as Array<TypeBigRational>;
 	return vst[0];
 });
 
-OverloadBasic.add("sub", [TypeID.BigRational, TypeID.BigRational], (vs) => {
+OverloadBasicClosed.add("sub", [TypeID.BigRational, TypeID.BigRational], (vs) => {
 	let vst = vs as Array<TypeBigRational>;
 	return new TypeBigRational(vst[0].num * vst[1].den - vst[1].num * vst[0].den, vst[0].den * vst[1].den);
 });
 
-OverloadBasic.add("neg", [TypeID.BigRational], (vs) => {
+OverloadBasicClosed.add("neg", [TypeID.BigRational], (vs) => {
 	let vst = vs as Array<TypeBigRational>;
 	return new TypeBigRational(-vst[0].num, vst[0].den);
 });
 
-OverloadBasic.add("mul", [TypeID.BigRational, TypeID.BigRational], (vs) => {
+OverloadBasicClosed.add("mul", [TypeID.BigRational, TypeID.BigRational], (vs) => {
 	let vst = vs as Array<TypeBigRational>;
 	return new TypeBigRational(vst[0].num * vst[1].num, vst[0].den * vst[1].den);
 });
 
-OverloadBasic.add("div", [TypeID.BigRational, TypeID.BigRational], (vs) => {
+OverloadBasicClosed.add("div", [TypeID.BigRational, TypeID.BigRational], (vs) => {
 	let vst = vs as Array<TypeBigRational>;
 	return new TypeBigRational(vst[0].num * vst[1].den, vst[0].den * vst[1].num);
 });

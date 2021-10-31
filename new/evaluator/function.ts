@@ -2,7 +2,7 @@ import { Type } from "../numbers/types";
 import { Scope } from "./scope";
 import { Token } from "./token";
 
-import { OverloadScalar } from "../numbers/scalar";
+import { OverloadScalar } from "../numbers/uncertain";
 
 export const globalOverload = OverloadScalar;
 

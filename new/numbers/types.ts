@@ -1,19 +1,21 @@
 export enum TypeID {
 	BigInt,
 	BigRational,
+	TypeBasicClosed, //Algebraically closed
+
 	Number,
-	BigFloat,
+	//BigFloat,
 	TypeBasic,
-	//^ TypeBasic
+	
 	Uncertain,
-	TypeScalar,
-	//^ TypeScalar
+	TypeReal,
+	
 	Complex,
-	TypeNumber,
-	//^ TypeNumber
+	TypeScalar,
+	
 	Unit,
 	TypeValue,
-	//^ TypeValue
+	
 	Tensor,
 	Array
 };

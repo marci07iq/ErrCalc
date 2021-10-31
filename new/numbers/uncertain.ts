@@ -1,5 +1,5 @@
 import { Type, TypeID, TypeTrait, TypeConverter, Types, Overloads } from "./types";
-import { TypeBasic, OverloadBasic as OverloadBasic, TypeBigInt, TypeBigRational, TypeNumber } from "./basic";
+import { TypeBasic, OverloadBasic, TypeBigInt, TypeBigRational, TypeNumber } from "./basic";
 
 const TRAIT_UNCERTAIN: TypeTrait = {
 	id: TypeID.Uncertain,
@@ -9,6 +9,19 @@ const TRAIT_UNCERTAIN: TypeTrait = {
 		[TypeID.BigInt, {
 			fn: (val: any) => {
 				let valt = val as TypeBasic;
+				return new TypeUncertain(valt, new TypeBigInt(0n));
+			},
+			weight: 1
+		}],[TypeID.BigRational, {
+			fn: (val: any) => {
+				let valt = val as TypeBigRational;
+				return new TypeUncertain(valt, new TypeBigInt(0n));
+			},
+			weight: 1
+		}],
+		[TypeID.Number, {
+			fn: (val: any) => {
+				let valt = val as TypeNumber;
 				return new TypeUncertain(valt, new TypeBigInt(0n));
 			},
 			weight: 1
@@ -85,13 +98,13 @@ export class TypeUncertain implements Type {
 	}
 };
 
-export type TypeScalar = TypeBasic | TypeUncertain;
+export type TypeReal = TypeBasic | TypeUncertain;
 
-export const OverloadScalar = new Overloads<TypeBasic, TypeScalar>(OverloadBasic);
+export const OverloadReal = new Overloads<TypeBasic, TypeReal>(OverloadBasic);
 
 //Basic operators
 
-OverloadScalar.add("add", [TypeID.Uncertain, TypeID.Uncertain], (vs) => {
+OverloadReal.add("add", [TypeID.Uncertain, TypeID.Uncertain], (vs) => {
 	let vst = vs as Array<TypeUncertain>;
 	return new TypeUncertain(
 		OverloadBasic.call("add", [vst[0].val, vst[1].val]),
@@ -102,12 +115,12 @@ OverloadScalar.add("add", [TypeID.Uncertain, TypeID.Uncertain], (vs) => {
 		]));
 });
 
-OverloadScalar.add("pos", [TypeID.Uncertain], (vs) => {
+OverloadReal.add("pos", [TypeID.Uncertain], (vs) => {
 	let vst = vs as Array<TypeUncertain>;
 	return vst[0];
 });
 
-OverloadScalar.add("sub", [TypeID.Uncertain, TypeID.Uncertain], (vs) => {
+OverloadReal.add("sub", [TypeID.Uncertain, TypeID.Uncertain], (vs) => {
 	let vst = vs as Array<TypeUncertain>;
 	return new TypeUncertain(
 		OverloadBasic.call("sub", [vst[0].val, vst[1].val]),
@@ -118,14 +131,14 @@ OverloadScalar.add("sub", [TypeID.Uncertain, TypeID.Uncertain], (vs) => {
 		]));
 });
 
-OverloadScalar.add("neg", [TypeID.Uncertain], (vs) => {
+OverloadReal.add("neg", [TypeID.Uncertain], (vs) => {
 	let vst = vs as Array<TypeUncertain>;
 	return new TypeUncertain(
 		OverloadBasic.call("neg", [vst[0].val]),
 		vst[1].err);
 });
 
-OverloadScalar.add("mul", [TypeID.Uncertain, TypeID.Uncertain], (vs) => {
+OverloadReal.add("mul", [TypeID.Uncertain, TypeID.Uncertain], (vs) => {
 	let vst = vs as Array<TypeUncertain>;
 	return new TypeUncertain(
 		OverloadBasic.call("mul", [vst[0].val, vst[1].val]),
@@ -143,7 +156,7 @@ OverloadScalar.add("mul", [TypeID.Uncertain, TypeID.Uncertain], (vs) => {
 		]));
 });
 
-OverloadScalar.add("div", [TypeID.Uncertain, TypeID.Uncertain], (vs) => {
+OverloadReal.add("div", [TypeID.Uncertain, TypeID.Uncertain], (vs) => {
 	let vst = vs as Array<TypeUncertain>;
 	return new TypeUncertain(
 		OverloadBasic.call("div", [vst[0].val, vst[1].val]),
@@ -168,7 +181,7 @@ OverloadScalar.add("div", [TypeID.Uncertain, TypeID.Uncertain], (vs) => {
 
 //Powers and logarithms
 
-OverloadScalar.add("sqrt", [TypeID.Uncertain], (vs) => {
+OverloadReal.add("sqrt", [TypeID.Uncertain], (vs) => {
 	let vst = vs as Array<TypeUncertain>;
 	return new TypeUncertain(
 		OverloadBasic.call("sqrt", [vst[0].val]),
@@ -179,7 +192,7 @@ OverloadScalar.add("sqrt", [TypeID.Uncertain], (vs) => {
 	);
 });
 
-OverloadScalar.add("exp", [TypeID.Uncertain], (vs) => {
+OverloadReal.add("exp", [TypeID.Uncertain], (vs) => {
 	let vst = vs as Array<TypeUncertain>;
 	return new TypeUncertain(
 		OverloadBasic.call("exp", [vst[0].val]),
@@ -190,7 +203,7 @@ OverloadScalar.add("exp", [TypeID.Uncertain], (vs) => {
 	);
 });
 
-OverloadScalar.add("pow", [TypeID.Uncertain, TypeID.Uncertain], (vs) => {
+OverloadReal.add("pow", [TypeID.Uncertain, TypeID.Uncertain], (vs) => {
 	let vst = vs as Array<TypeUncertain>;
 	/*return new TypeUncertain(
 		OverloadsBasic.call("pow", [vst[0].val, vst[1].val]),
@@ -205,15 +218,15 @@ OverloadScalar.add("pow", [TypeID.Uncertain, TypeID.Uncertain], (vs) => {
 			])
 		])
 	);*/
-	return OverloadScalar.call("exp", [
-		OverloadScalar.call("mul", [
+	return OverloadReal.call("exp", [
+		OverloadReal.call("mul", [
 			vst[1],
-			OverloadScalar.call("ln", [vst[0]])
+			OverloadReal.call("ln", [vst[0]])
 		])
 	])
 });
 
-OverloadScalar.add("ln", [TypeID.Uncertain], (vs) => {
+OverloadReal.add("ln", [TypeID.Uncertain], (vs) => {
 	let vst = vs as Array<TypeUncertain>;
 	return new TypeUncertain(
 		OverloadBasic.call("ln", [vst[0].val]),
@@ -221,33 +234,33 @@ OverloadScalar.add("ln", [TypeID.Uncertain], (vs) => {
 	);
 });
 
-OverloadScalar.add("log", [TypeID.Uncertain, TypeID.Uncertain], (vs) => {
+OverloadReal.add("log", [TypeID.Uncertain, TypeID.Uncertain], (vs) => {
 	let vst = vs as Array<TypeUncertain>;
-	return OverloadScalar.call("div", [
-		OverloadScalar.call("ln", [vst[0]]),
-		OverloadScalar.call("ln", [vst[1]])
+	return OverloadReal.call("div", [
+		OverloadReal.call("ln", [vst[0]]),
+		OverloadReal.call("ln", [vst[1]])
 	]);
 });
 
-OverloadScalar.add("log2", [TypeID.Uncertain], (vs) => {
+OverloadReal.add("log2", [TypeID.Uncertain], (vs) => {
 	let vst = vs as Array<TypeUncertain>;
-	return OverloadScalar.call("div", [
-		OverloadScalar.call("ln", [vst[0]]),
+	return OverloadReal.call("div", [
+		OverloadReal.call("ln", [vst[0]]),
 		new TypeNumber(Math.LN2)
 	]);
 });
 
-OverloadScalar.add("log10", [TypeID.Uncertain], (vs) => {
+OverloadReal.add("log10", [TypeID.Uncertain], (vs) => {
 	let vst = vs as Array<TypeUncertain>;
-	return OverloadScalar.call("div", [
-		OverloadScalar.call("ln", [vst[0]]),
+	return OverloadReal.call("div", [
+		OverloadReal.call("ln", [vst[0]]),
 		new TypeNumber(Math.LN10)
 	]);
 });
 
 //Trig shit
 
-OverloadScalar.add("sin", [TypeID.Uncertain], (vs) => {
+OverloadReal.add("sin", [TypeID.Uncertain], (vs) => {
 	let vst = vs as Array<TypeUncertain>;
 	return new TypeUncertain(
 		OverloadBasic.call("sin", [vst[0].val]),
@@ -260,7 +273,7 @@ OverloadScalar.add("sin", [TypeID.Uncertain], (vs) => {
 	);
 });
 
-OverloadScalar.add("cos", [TypeID.Uncertain], (vs) => {
+OverloadReal.add("cos", [TypeID.Uncertain], (vs) => {
 	let vst = vs as Array<TypeUncertain>;
 	return new TypeUncertain(
 		OverloadBasic.call("cos", [vst[0].val]),
@@ -273,15 +286,15 @@ OverloadScalar.add("cos", [TypeID.Uncertain], (vs) => {
 	);
 });
 
-OverloadScalar.add("tan", [TypeID.Uncertain], (vs) => {
+OverloadReal.add("tan", [TypeID.Uncertain], (vs) => {
 	let vst = vs as Array<TypeUncertain>;
-	return OverloadScalar.call("div", [
-		OverloadScalar.call("sin", [vst[0]]),
-		OverloadScalar.call("cos", [vst[0]])
+	return OverloadReal.call("div", [
+		OverloadReal.call("sin", [vst[0]]),
+		OverloadReal.call("cos", [vst[0]])
 	]);
 });
 
-OverloadScalar.add("asin", [TypeID.Uncertain], (vs) => {
+OverloadReal.add("asin", [TypeID.Uncertain], (vs) => {
 	let vst = vs as Array<TypeUncertain>;
 	return new TypeUncertain(
 		OverloadBasic.call("asin", [vst[0].val]),
@@ -297,7 +310,7 @@ OverloadScalar.add("asin", [TypeID.Uncertain], (vs) => {
 	);
 });
 
-OverloadScalar.add("acos", [TypeID.Uncertain], (vs) => {
+OverloadReal.add("acos", [TypeID.Uncertain], (vs) => {
 	let vst = vs as Array<TypeUncertain>;
 	return new TypeUncertain(
 		OverloadBasic.call("acos", [vst[0].val]),
@@ -313,7 +326,7 @@ OverloadScalar.add("acos", [TypeID.Uncertain], (vs) => {
 	);
 });
 
-OverloadScalar.add("atan", [TypeID.Uncertain], (vs) => {
+OverloadReal.add("atan", [TypeID.Uncertain], (vs) => {
 	let vst = vs as Array<TypeUncertain>;
 	return new TypeUncertain(
 		OverloadBasic.call("atan", [vst[0].val]),
@@ -327,27 +340,27 @@ OverloadScalar.add("atan", [TypeID.Uncertain], (vs) => {
 	);
 });
 
-OverloadScalar.add("ctg", [TypeID.Uncertain], (vs) => {
+OverloadReal.add("ctg", [TypeID.Uncertain], (vs) => {
 	let vst = vs as Array<TypeUncertain>;
-	return OverloadScalar.call("div", [
-		OverloadScalar.call("cos", [vst[0]]),
-		OverloadScalar.call("sin", [vst[0]])
+	return OverloadReal.call("div", [
+		OverloadReal.call("cos", [vst[0]]),
+		OverloadReal.call("sin", [vst[0]])
 	]);
 });
 
-OverloadScalar.add("sec", [TypeID.Uncertain], (vs) => {
+OverloadReal.add("sec", [TypeID.Uncertain], (vs) => {
 	let vst = vs as Array<TypeUncertain>;
-	return OverloadScalar.call("div", [
+	return OverloadReal.call("div", [
 		new TypeNumber(1),
-		OverloadScalar.call("cos", [vst[0]])
+		OverloadReal.call("cos", [vst[0]])
 	]);
 });
 
-OverloadScalar.add("csc", [TypeID.Uncertain], (vs) => {
+OverloadReal.add("csc", [TypeID.Uncertain], (vs) => {
 	let vst = vs as Array<TypeUncertain>;
-	return OverloadScalar.call("div", [
+	return OverloadReal.call("div", [
 		new TypeNumber(1),
-		OverloadScalar.call("sin", [vst[0]])
+		OverloadReal.call("sin", [vst[0]])
 	]);
 });
 

@@ -1,6 +1,6 @@
 import { Token, TokenNumber } from "../evaluator/token";
 import { TypeNumber, TypeBigInt, TypeBasic } from "../numbers/basic";
-import { TypeUncertain } from "../numbers/scalar";
+import { TypeUncertain } from "../numbers/uncertain";
 import { StringStream } from "../utils/string_stream";
 import { parseUncertain } from "./uncertain";
 
