@@ -1,6 +1,11 @@
 import { Type } from "../numbers/types";
 import { Function } from "./function";
 
+/*export interface ScopeFnEntry {
+	fn: Function,
+	
+}*/
+
 export class Scope {
 	//Private: cant be accessed by inner scopes
 	//Used for function params

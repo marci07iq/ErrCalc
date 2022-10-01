@@ -2,6 +2,38 @@ import { Type, TypeID, TypeTrait, TypeConverter, Types, Overloads, } from "./typ
 import { FormatType } from "../settings/settings";
 import { printNumber } from "./number_utils";
 
+//Bool
+
+const TRAIT_BOOL: TypeTrait = {
+	id: TypeID.Bool,
+	//traits: [TypeID.TypeBasic],
+	name: "Bool",
+	converters: new Map<TypeID, TypeConverter>([
+		
+	])
+};
+
+Types.set(TRAIT_BOOL.id, TRAIT_BOOL);
+
+export class TypeBool implements Type {
+	val: boolean;
+
+	get_type(): TypeTrait {
+		return TRAIT_BOOL;
+	}
+
+	constructor(val: boolean) {
+		this.val = val;
+	}
+
+	print_text(): string {
+		return (this.val) ? "true" : "false";
+	}
+	print_tex(): string {
+		return this.print_text();
+	}
+};
+
 //BigInt
 
 const TRAIT_BIG_INT: TypeTrait = {
@@ -9,6 +41,14 @@ const TRAIT_BIG_INT: TypeTrait = {
 	//traits: [TypeID.TypeBasic],
 	name: "BigInt",
 	converters: new Map<TypeID, TypeConverter>([
+		//No implicit bool->int
+		/*[TypeID.Bool, {
+			fn: (val: any) => {
+				let valt = val as TypeBool;
+				return new TypeBigInt(valt.val ? 1n : 0n);
+			},
+			weight: 1
+		}]*/
 	])
 };
 
@@ -148,44 +188,56 @@ export const OverloadBasic = new Overloads<TypeBasicClosed, TypeBasic>(OverloadB
 
 //Alegbra operators (algebraically closed)
 
-//BigInt
+//Bool
 
-OverloadBasicClosed.add("abs", [TypeID.BigInt], (vs) => {
-	let vst = vs as Array<TypeBigInt>;
-	return new TypeBigInt(vst[0].val < 0 ? -vst[0].val : vst[0].val);
+OverloadBasicClosed.add("\\tco", [TypeID.Bool, TypeID.Bool], (vs) => {
+	let vst = vs as Array<TypeBool>;
+	return new TypeBigInt((vst[0].val == vst[1].val) ? 18n : 16n);
 });
 
-OverloadBasicClosed.add("add", [TypeID.BigInt, TypeID.BigInt], (vs) => {
+//BigInt
+
+OverloadBasicClosed.add("\\tco", [TypeID.BigInt, TypeID.BigInt], (vs) => {
+	let vst = vs as Array<TypeBigInt>;
+	return new TypeBigInt((vst[0].val == vst[1].val) ? 58n : (vst[0].val < vst[1].val ? 57n : 60n));
+});
+
+OverloadBasicClosed.add("\\add", [TypeID.BigInt, TypeID.BigInt], (vs) => {
 	let vst = vs as Array<TypeBigInt>;
 	return new TypeBigInt(vst[0].val + vst[1].val);
 });
 
-OverloadBasicClosed.add("pos", [TypeID.BigInt], (vs) => {
+OverloadBasicClosed.add("\\pos", [TypeID.BigInt], (vs) => {
 	let vst = vs as Array<TypeBigInt>;
 	return vst[0];
 });
 
-OverloadBasicClosed.add("sub", [TypeID.BigInt, TypeID.BigInt], (vs) => {
+OverloadBasicClosed.add("\\sub", [TypeID.BigInt, TypeID.BigInt], (vs) => {
 	let vst = vs as Array<TypeBigInt>;
 	return new TypeBigInt(vst[0].val - vst[1].val);
 });
 
-OverloadBasicClosed.add("neg", [TypeID.BigInt], (vs) => {
+OverloadBasicClosed.add("\\neg", [TypeID.BigInt], (vs) => {
 	let vst = vs as Array<TypeBigInt>;
 	return new TypeBigInt(-vst[0].val);
 });
 
-OverloadBasicClosed.add("mul", [TypeID.BigInt, TypeID.BigInt], (vs) => {
+OverloadBasicClosed.add("\\mul", [TypeID.BigInt, TypeID.BigInt], (vs) => {
 	let vst = vs as Array<TypeBigInt>;
 	return new TypeBigInt(vst[0].val * vst[1].val);
 });
 
-OverloadBasicClosed.add("div", [TypeID.BigInt, TypeID.BigInt], (vs) => {
+OverloadBasicClosed.add("\\div", [TypeID.BigInt, TypeID.BigInt], (vs) => {
 	let vst = vs as Array<TypeBigInt>;
 	return new TypeBigRational(vst[0].val, vst[1].val);
 });
 
-OverloadBasicClosed.add("pow", [TypeID.BigInt, TypeID.BigInt], (vs) => {
+OverloadBasicClosed.add("\\mod", [TypeID.BigInt, TypeID.BigInt], (vs) => {
+	let vst = vs as Array<TypeBigInt>;
+	return new TypeBigInt(vst[0].val % vst[1].val);
+});
+
+OverloadBasicClosed.add("\\pow", [TypeID.BigInt, TypeID.BigInt], (vs) => {
 	let vst = vs as Array<TypeBigInt>;
 	if(vst[1].val >= 0) {
 		return new TypeBigInt(vst[0].val ** vst[1].val);
@@ -194,47 +246,65 @@ OverloadBasicClosed.add("pow", [TypeID.BigInt, TypeID.BigInt], (vs) => {
 	return new TypeBigRational(1n, vst[0].val ** (-vst[1].val));
 });
 
-//BigRational
-
-OverloadBasicClosed.add("abs", [TypeID.BigRational], (vs) => {
-	let vst = vs as Array<TypeBigRational>;
-	return new TypeBigRational(
-		vst[0].num < 0 ? -vst[0].num : vst[0].num,
-		vst[1].den
-	);
+OverloadBasicClosed.add("abs", [TypeID.BigInt], (vs) => {
+	let vst = vs as Array<TypeBigInt>;
+	return new TypeBigInt(vst[0].val < 0 ? -vst[0].val : vst[0].val);
 });
 
-OverloadBasicClosed.add("add", [TypeID.BigRational, TypeID.BigRational], (vs) => {
+OverloadBasicClosed.add("re", [TypeID.BigInt], (vs) => {
+	let vst = vs as Array<TypeBigInt>;
+	return new TypeBigInt(vst[0].val);
+});
+
+OverloadBasicClosed.add("im", [TypeID.BigInt], (vs) => {
+	let vst = vs as Array<TypeBigInt>;
+	return new TypeBigInt(0n);
+});
+
+//BigRational
+
+OverloadBasicClosed.add("\\tco", [TypeID.BigRational, TypeID.BigRational], (vs) => {
+	let vst = vs as Array<TypeBigRational>;
+	let vsti = [vst[0].num * vst[1].den, vst[1].num * vst[0].den];
+	return new TypeBigInt((vsti[0] == vsti[1]) ? 58n : (vsti[0] < vsti[1] ? 57n : 60n));
+});
+
+OverloadBasicClosed.add("\\add", [TypeID.BigRational, TypeID.BigRational], (vs) => {
 	let vst = vs as Array<TypeBigRational>;
 	return new TypeBigRational(vst[0].num * vst[1].den + vst[1].num * vst[0].den, vst[0].den * vst[1].den);
 });
 
-OverloadBasicClosed.add("pos", [TypeID.BigRational], (vs) => {
+OverloadBasicClosed.add("\\pos", [TypeID.BigRational], (vs) => {
 	let vst = vs as Array<TypeBigRational>;
 	return vst[0];
 });
 
-OverloadBasicClosed.add("sub", [TypeID.BigRational, TypeID.BigRational], (vs) => {
+OverloadBasicClosed.add("\\sub", [TypeID.BigRational, TypeID.BigRational], (vs) => {
 	let vst = vs as Array<TypeBigRational>;
 	return new TypeBigRational(vst[0].num * vst[1].den - vst[1].num * vst[0].den, vst[0].den * vst[1].den);
 });
 
-OverloadBasicClosed.add("neg", [TypeID.BigRational], (vs) => {
+OverloadBasicClosed.add("\\neg", [TypeID.BigRational], (vs) => {
 	let vst = vs as Array<TypeBigRational>;
 	return new TypeBigRational(-vst[0].num, vst[0].den);
 });
 
-OverloadBasicClosed.add("mul", [TypeID.BigRational, TypeID.BigRational], (vs) => {
+OverloadBasicClosed.add("\\mul", [TypeID.BigRational, TypeID.BigRational], (vs) => {
 	let vst = vs as Array<TypeBigRational>;
 	return new TypeBigRational(vst[0].num * vst[1].num, vst[0].den * vst[1].den);
 });
 
-OverloadBasicClosed.add("div", [TypeID.BigRational, TypeID.BigRational], (vs) => {
+OverloadBasicClosed.add("\\div", [TypeID.BigRational, TypeID.BigRational], (vs) => {
 	let vst = vs as Array<TypeBigRational>;
 	return new TypeBigRational(vst[0].num * vst[1].den, vst[0].den * vst[1].num);
 });
 
-OverloadBasic.add("pow", [TypeID.BigRational, TypeID.BigRational], (vs) => {
+OverloadBasicClosed.add("\\mod", [TypeID.BigRational, TypeID.BigRational], (vs) => {
+	let vst = vs as Array<TypeBigRational>;
+	return new TypeBigRational((vst[0].num * vst[1].den) % (vst[0].den * vst[1].num), vst[0].den * vst[1].den);
+});
+
+OverloadBasic.add("\\pow", [TypeID.BigRational, TypeID.BigRational], (vs) => {
 	let vst = vs as Array<TypeBigRational>;
 	if(vst[1].den == 1n) {
 		if(vst[1].num >= 0) {
@@ -246,43 +316,81 @@ OverloadBasic.add("pow", [TypeID.BigRational, TypeID.BigRational], (vs) => {
 	return new TypeNumber((Number(vst[0].num) / Number(vst[0].den)) ** (Number(vst[1].num) / Number(vst[1].den)));
 });
 
+OverloadBasicClosed.add("abs", [TypeID.BigRational], (vs) => {
+	let vst = vs as Array<TypeBigRational>;
+	return new TypeBigRational(
+		vst[0].num < 0 ? -vst[0].num : vst[0].num,
+		vst[1].den
+	);
+});
+
+OverloadBasicClosed.add("re", [TypeID.BigRational], (vs) => {
+	let vst = vs as Array<TypeBigRational>;
+	return new TypeBigRational(vst[0].num, vst[0].den);
+});
+
+OverloadBasicClosed.add("im", [TypeID.BigRational], (vs) => {
+	let vst = vs as Array<TypeBigRational>;
+	return new TypeBigRational(0n, 1n);
+});
+
 //Number (simple JS float fallback)
 
 //Basic operators
+
+OverloadBasic.add("\\tco", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<TypeBigInt>;
+	return new TypeBigInt((vst[0].val == vst[1].val) ? 58n : (vst[0].val < vst[1].val ? 57n : 60n));
+});
+
+OverloadBasic.add("\\add", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<TypeNumber>;
+	return new TypeNumber(vst[0].val + vst[1].val);
+});
+
+OverloadBasic.add("\\pos", [TypeID.Number], (vs) => {
+	let vst = vs as Array<TypeNumber>;
+	return vst[0];
+});
+
+OverloadBasic.add("\\sub", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<TypeNumber>;
+	return new TypeNumber(vst[0].val - vst[1].val);
+});
+
+OverloadBasic.add("\\neg", [TypeID.Number], (vs) => {
+	let vst = vs as Array<TypeNumber>;
+	return new TypeNumber(-vst[0].val);
+});
+
+OverloadBasic.add("\\mul", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<TypeNumber>;
+	return new TypeNumber(vst[0].val * vst[1].val);
+});
+
+OverloadBasic.add("\\div", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<TypeNumber>;
+	return new TypeNumber(vst[0].val / vst[1].val);
+});
+
+OverloadBasic.add("\\mod", [TypeID.Number, TypeID.Number], (vs) => {
+	let vst = vs as Array<TypeNumber>;
+	return new TypeNumber(vst[0].val % vst[1].val);
+});
 
 OverloadBasic.add("abs", [TypeID.Number], (vs) => {
 	let vst = vs as Array<TypeNumber>;
 	return new TypeNumber(vst[0].val < 0 ? -vst[0].val : vst[0].val);
 });
 
-OverloadBasic.add("add", [TypeID.Number, TypeID.Number], (vs) => {
+OverloadBasic.add("re", [TypeID.Number], (vs) => {
 	let vst = vs as Array<TypeNumber>;
-	return new TypeNumber(vst[0].val + vst[1].val);
+	return new TypeNumber(vst[0].val);
 });
 
-OverloadBasic.add("pos", [TypeID.Number], (vs) => {
+OverloadBasic.add("im", [TypeID.Number], (vs) => {
 	let vst = vs as Array<TypeNumber>;
-	return vst[0];
-});
-
-OverloadBasic.add("sub", [TypeID.Number, TypeID.Number], (vs) => {
-	let vst = vs as Array<TypeNumber>;
-	return new TypeNumber(vst[0].val - vst[1].val);
-});
-
-OverloadBasic.add("neg", [TypeID.Number], (vs) => {
-	let vst = vs as Array<TypeNumber>;
-	return new TypeNumber(-vst[0].val);
-});
-
-OverloadBasic.add("mul", [TypeID.Number, TypeID.Number], (vs) => {
-	let vst = vs as Array<TypeNumber>;
-	return new TypeNumber(vst[0].val * vst[1].val);
-});
-
-OverloadBasic.add("div", [TypeID.Number, TypeID.Number], (vs) => {
-	let vst = vs as Array<TypeNumber>;
-	return new TypeNumber(vst[0].val / vst[1].val);
+	return new TypeNumber(0);
 });
 
 //Powers and logarithms

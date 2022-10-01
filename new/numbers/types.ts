@@ -1,4 +1,5 @@
 export enum TypeID {
+	Bool,
 	BigInt,
 	BigRational,
 	TypeBasicClosed, //Algebraically closed
@@ -17,7 +18,10 @@ export enum TypeID {
 	TypeValue,
 	
 	Tensor,
-	Array
+	TypeTensor,
+
+	Array,
+	TypeObject
 };
 
 export interface TypeConverter {
@@ -41,58 +45,6 @@ export interface Type {
 	print_tex(): string;
 };
 
-/*export abstract class TypeSystem {
-	//Static factory
-	abstract factory(val: number): Type;
-
-	abstract parseNumber(stream: StringStream): TokenNumber;
-
-	//Basic
-	abstract add(lhs: Type, rhs: Type): Type;
-	abstract sub(lhs: Type, rhs: Type): Type;
-	abstract mul(lhs: Type, rhs: Type): Type;
-	abstract div(lhs: Type, rhs: Type): Type;
-
-	//Exponential
-	abstract pow(lhs: Type, rhs: Type): Type;
-	abstract loge(lhs: Type): Type;
-
-	sqrt(lhs: Type): Type {
-		return this.pow(lhs, this.factory(0.5));
-	}
-	exp(lhs: Type): Type {
-		return this.pow(this.factory(Math.E), lhs);
-	}
-	log2(lhs: Type): Type {
-		return this.div(this.loge(lhs), this.factory(Math.LN2));
-	}
-	log10(lhs: Type): Type {
-		return this.div(this.loge(lhs), this.factory(Math.LN10));
-	}
-	log(lhs: Type, rhs: Type): Type {
-		return this.div(this.loge(lhs), this.loge(rhs));
-	}
-
-	//Trig
-	abstract sin(lhs: Type): Type;
-	abstract cos(lhs: Type): Type;
-	abstract asin(lhs: Type): Type;
-	abstract acos(lhs: Type): Type;
-	abstract atan(lhs: Type): Type;
-
-	tan(lhs: Type): Type {
-		return this.div(this.sin(lhs), this.cos(lhs));
-	};
-	ctg(lhs: Type): Type {
-		return this.div(this.cos(lhs), this.sin(lhs));
-	};
-	sec(lhs: Type): Type {
-		return this.div(this.factory(1), this.cos(lhs));
-	};
-	csc(lhs: Type): Type {
-		return this.div(this.factory(1), this.sin(lhs));
-	};
-}*/
 class OverloadedFunction<RetType extends Type> {
 	types: Array<TypeID>;
 	fn: (args: Array<any>) => RetType;
@@ -151,11 +103,10 @@ export class Overloads<BaseType extends RetType, RetType extends Type> {
 		args: Array<TypeID>
 	): OverloadedFunctionCandidate<RetType> | undefined {
 		let overloads = this.fns.get(name);
-		if(overloads === undefined) throw new Error("Unknown builtin function " + name);
 		
 		let best: OverloadedFunctionCandidate<RetType> | undefined = this.base?.find(name, args);
 
-		overloads.forEach((overload) => {
+		overloads?.forEach((overload) => {
 			if(overload.types.length == args.length) {
 				let wt = 0;
 				for(let i = 0; i < args.length; i++) {

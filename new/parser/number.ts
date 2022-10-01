@@ -1,5 +1,11 @@
 import { StringStream } from "../utils/string_stream";
 
+import { Token, TokenNumber } from "../evaluator/token";
+import { TypeNumber, TypeBigInt, TypeBasic } from "../numbers/basic";
+import { TypeUncertain, TypeReal } from "../numbers/uncertain";
+import { TypeScalar } from "../numbers/complex";
+import { TypeValue } from "../numbers/unit";
+
 //
 // Digit parser
 //
@@ -163,4 +169,100 @@ export function parseScientific(stream: StringStream): number | bigint | undefin
 	}
 
 	return float;
+}
+
+export function parseScientificType(stream: StringStream): TypeBasic | undefined {
+	let num = parseScientific(stream);
+
+	switch(typeof num) {
+		case "bigint":
+			return new TypeBigInt(num);
+			break;
+		case "number":
+			return new TypeNumber(num);
+			break;
+		case "undefined":
+			return undefined;
+	}
+}
+
+//
+// Error symbol parser
+//
+
+function isErrorSymbol(char: string): boolean {
+	if (char === '#') return true;
+	if (char === '\u00B1') return true;
+	return false;
+}
+
+export function parseErrorSymbol(stream: StringStream): boolean {
+	let errchar = stream.peek(1);
+	if (isErrorSymbol(errchar)) {
+		stream.skip(1);
+		return true;
+	}
+	return false;
+}
+
+//
+//Uncertain number parser
+//
+
+export function parseUncertainType(stream: StringStream) : TypeReal | undefined {
+	let val = parseScientificType(stream);
+	
+	if(val === undefined) return undefined;
+
+	let s = stream.transaction();
+
+	s.skipThrough();
+
+	if(parseErrorSymbol(s)) {
+		let err: TypeBasic | undefined = parseScientificType(s);
+
+		if(err === undefined) {
+			s.error("No number found after uncertaintly symbol");
+			return undefined;
+		}
+
+		s.commit();
+
+		return new TypeUncertain(val, err);
+	}
+
+	return val;
+}
+
+//Complex
+
+export function parseImaginarySuffix(stream: StringStream): boolean {
+	let errchar = stream.peek(1);
+	if (isErrorSymbol(errchar)) {
+		stream.skip(1);
+		return true;
+	}
+	return false;
+}
+
+export function parseComplexType(stream: StringStream) : TypeScalar | undefined {
+	let num = parseUncertainType(stream);
+	/*let s = stream.transaction();
+	if(parseImaginarySuffix(stream)) {
+		return 
+		s.commit();
+	}*/
+	return num;
+}
+
+//Units
+
+export function parseUnitsType(stream: StringStream) : TypeValue | undefined {
+	return parseComplexType(stream);
+}
+
+export function parseNumericToken(stream: StringStream) : Token | undefined {
+	let num = parseUnitsType(stream);
+	if(num == undefined) return undefined;
+	return new TokenNumber(num);
 }

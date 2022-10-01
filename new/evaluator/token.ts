@@ -4,6 +4,7 @@ import { Type } from "../numbers/types";
 export interface Token {
 	evaluate(scope: Scope): Type;
 	debug_write(): string;
+	latex_write(): string;
 }
 
 export class TokenNumber implements Token {
@@ -18,6 +19,9 @@ export class TokenNumber implements Token {
 	}
 	debug_write(): string {
 		return "Number " + this.val.print_text();
+	}
+	latex_write(): string {
+		return this.val.print_tex();
 	}
 }
 
@@ -37,6 +41,9 @@ export class TokenVar implements Token {
 	}
 	debug_write(): string {
 		return "Var " + this.name;
+	}
+	latex_write(): string {
+		return this.name;
 	}
 }
 
@@ -58,5 +65,8 @@ export class TokenFunction implements Token {
 	}
 	debug_write(): string {
 		return "Fn " + this.name + "(" + this.args.map((arg) => arg.debug_write()).join(", ") + ")";
+	}
+	latex_write(): string {
+		return this.name + "\\left(" + this.args.map((arg) => arg.latex_write()).join(", ") + "\\right)";
 	}
 }

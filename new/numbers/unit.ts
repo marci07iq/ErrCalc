@@ -92,6 +92,9 @@ export const OverloadValue = new Overloads<TypeScalar, TypeValue>(OverloadScalar
 
 type Units = Map<string, TypeBasicClosed>;
 
+type UnitRegistry = Map<string, Units>;
+
+//Multiply two units (adds the underlying base units)
 function mulUnits(lhs: Units, rhs: Units) : Units {
 	let res: Units = new Map<string, TypeBasicClosed>();
 
@@ -100,21 +103,11 @@ function mulUnits(lhs: Units, rhs: Units) : Units {
 	}
 
 	for(const [key, val] of rhs.entries()) {
-		res.set(key, OverloadBasicClosed.call("add", [res.get(key) ?? new TypeBigInt(0n), val]));
+		res.set(key, OverloadBasicClosed.call("\\add", [res.get(key) ?? new TypeBigInt(0n), val]));
 	}
 	
 	return res;
 }
-
-/*function negUnits(unit: Units): Units {
-	let res: Units = new Map<string, TypeBasicClosed>();
-
-	for(const [key, val] of unit.entries()) {
-		res.set(key, OverloadBasicClosed.call("neg", [val]));
-	}
-	
-	return res;
-}*/
 
 function divUnits(lhs: Units, rhs: Units): Units {
 	let res: Units = new Map<string, TypeBasicClosed>();
@@ -124,7 +117,7 @@ function divUnits(lhs: Units, rhs: Units): Units {
 	}
 
 	for(const [key, val] of rhs.entries()) {
-		res.set(key, OverloadBasicClosed.call("sub", [res.get(key) ?? new TypeBigInt(0n), val]));
+		res.set(key, OverloadBasicClosed.call("\\sub", [res.get(key) ?? new TypeBigInt(0n), val]));
 	}
 	
 	return res;
@@ -134,24 +127,20 @@ function powUnits(lhs: Units, rhs: TypeBasicClosed): Units {
 	let res: Units = new Map<string, TypeBasicClosed>();
 
 	for(const [key, val] of lhs.entries()) {
-		res.set(key, OverloadBasicClosed.call("mul", [val, rhs]));
+		res.set(key, OverloadBasicClosed.call("\\mul", [val, rhs]));
 	}
 	
 	return res;
 }
 
-export function createSiUnit(kmsAKcm: Array<TypeBasicClosed>) : Units {
-	return new Map<string, TypeBasicClosed>([
-		["kg", kmsAKcm[0]],
-		["m", kmsAKcm[1]],
-		["s", kmsAKcm[2]],
-		["A", kmsAKcm[3]],
-		["K", kmsAKcm[4]],
-		["cd", kmsAKcm[5]],
-		["mol", kmsAKcm[6]],
-	]);
+function isTrivial(units: Units) {
+	let zeros = true;
+	for(const [key, val] of units.entries()) {
+		
+	}
 }
 
-function recognizeUnit() {
-	
+function recognizeUnit(units: Units, registry: UnitRegistry) {
+	//Only recognizes a combination of two registered units
+
 }
