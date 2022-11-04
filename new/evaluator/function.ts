@@ -7,25 +7,6 @@ import { OverloadValue } from "../numbers/unit";
 
 export const globalOverload = OverloadValue;
 
-export function FuntionPrinterBinaryOp(symbol, args): string {
-	return args[0].latex_write() + symbol + args[1].latex_write();
-}
-export function FuntionPrinterDiv(symbol, args): string {
-	return "\\frac{" + args[0].latex_write() + "}{" + symbol + args[1].latex_write() + "}";
-}
-export function FuntionPrinterUnaryPreOp(symbol, args): string {
-	return symbol + args[0].latex_write();
-}
-export function FuntionPrinterName(name, args): string {
-	return name + "\\left(" + args.map((arg) => arg.latex_write()).join(", ") + "\\right)";
-}
-export function FuntionPrinterSqrt(args): string {
-	return "\\sqrt{" + args[0].latex_write() + "}";
-}
-export function FuntionPrinterLog(args): string {
-	return "\\log_{" + args[1].latex_write() + "}\\left(" + args[0].latex_write() + "\\right)";
-}
-
 export abstract class Function {
 	constructor() {
 	}
@@ -33,8 +14,11 @@ export abstract class Function {
 	abstract evaluate(scope: Scope, args: Array<Token>): Type;
 }
 
+//Evaluator of a user defined function
 export class FunctionUser extends Function {
+	//Names of arguments as expected
 	argnames: Array<string>;
+	//Syntax tree inside function
 	token: Token;
 
 	constructor(argnames: Array<string>, token: Token) {
@@ -63,6 +47,7 @@ export class FunctionUser extends Function {
 	}
 }
 
+//Evaluator for builtin operators and functions
 export class FunctionBuiltinAlgebra extends Function {
 	name: string;
 	constructor(name: string) {
@@ -76,6 +61,7 @@ export class FunctionBuiltinAlgebra extends Function {
 	}
 }
 
+//Evaluator for the comparison operators based on the TCO
 export class FunctionBuiltinCompare extends Function {
 	mask: bigint;
 	testmask: bigint;

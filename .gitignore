@@ -3,3 +3,5 @@ build/
 App/*
 !App/www*
 App/www/img*
+node_modules/
+package-lock.json

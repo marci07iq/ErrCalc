@@ -1,12 +1,14 @@
 {
 	"compilerOptions": {
+		"allowJs": true,
 		"module": "amd",
 		"target": "es2020",
 		"jsx": "preserve",
 		"strictFunctionTypes": true,
 		"sourceMap": true,
 		"outFile": "./build/build.js",
-		"strictNullChecks": true
+		"strictNullChecks": true,
+		"moduleResolution": "node"
 	},
 	"include": [
 		"new"

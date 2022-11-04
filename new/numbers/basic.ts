@@ -130,7 +130,7 @@ export class TypeBigRational implements Type {
 		return this.num.toString() + "/" + this.den.toString();
 	}
 	print_tex(): string {
-		return "\\frac{" + this.num.toString() + "," + this.den.toString() + "}";
+		return "\\frac{" + this.num.toString() + "}{" + this.den.toString() + "}";
 	}
 };
 
