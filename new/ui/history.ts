@@ -6,9 +6,11 @@ import { PrintTex } from "../transformer/print";
 import { Simplify } from "../transformer/simplify";
 import { createElem } from "../utils/dom";
 
+const katex = require('katex');
+
 //import { parse, HtmlGenerator } from 'latex.js'
 
-declare var katex;
+//declare var katex;
 
 export interface QueryOutput {
     elem: HTMLElement;
