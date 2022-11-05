@@ -23,4 +23,6 @@ window.PrintTex = window.PrintTex || PrintTex;
 window.name = "ASD";
 console.log("Hello world");
 
-window.document.body.appendChild(new_ctx.elem);
+window.onload = () => {
+	window.document.body.appendChild(new_ctx.elem);
+}
